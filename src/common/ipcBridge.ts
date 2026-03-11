@@ -98,12 +98,22 @@ export const application = {
   getZoomFactor: bridge.buildProvider<number, void>('app.get-zoom-factor'),
   setZoomFactor: bridge.buildProvider<number, { factor: number }>('app.set-zoom-factor'),
   // CDP (Chrome DevTools Protocol) management
+  cdp: {
+    getStatus: bridge.buildProvider<ICdpStatus, void>('cdp.get-status'),
+    setConfig: bridge.buildProvider<ICdpStatus, ICdpConfig>('cdp.set-config'),
+  },
   getCdpStatus: bridge.buildProvider<IBridgeResponse<ICdpStatus>, void>('app.get-cdp-status'), // 获取 CDP 状态
   updateCdpConfig: bridge.buildProvider<IBridgeResponse<ICdpConfig>, Partial<ICdpConfig>>('app.update-cdp-config'), // 更新 CDP 配置
   // Bridge Main Process logs to Renderer F12 Console
   logStream: bridge.buildEmitter<{ level: 'log' | 'warn' | 'error'; tag: string; message: string; data?: unknown }>('app.log-stream'),
   // DevTools state change notification
   devToolsStateChanged: bridge.buildEmitter<{ isOpen: boolean }>('app.devtools-state-changed'),
+};
+
+// n8n microservice API
+export const n8n = {
+  execute: bridge.buildProvider<{ success: boolean; data?: any; error?: string; errorType?: string }, { userMessage: string; attachments?: any[] }>('n8n:execute'),
+  health: bridge.buildProvider<{ status: string; available: boolean }, void>('n8n:health'),
 };
 
 // Manual (opt-in) updates via GitHub Releases

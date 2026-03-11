@@ -299,6 +299,26 @@ export type TChatConversation =
         }
       >,
       'model'
+    >
+  | Omit<
+      IChatConversation<
+        'n8n',
+        {
+          workspace?: string;
+          customWorkspace?: boolean;
+          /** 启用的 skills 列表 / Enabled skills list */
+          enabledSkills?: string[];
+          /** 预设助手 ID / Preset assistant ID */
+          presetAssistantId?: string;
+          /** 是否置顶会话 / Whether this conversation is pinned */
+          pinned?: boolean;
+          /** 置顶时间戳（毫秒）/ Pin timestamp in milliseconds */
+          pinnedAt?: number;
+          /** Explicit marker for temporary health-check conversations */
+          isHealthCheck?: boolean;
+        }
+      >,
+      'model'
     >;
 
 export type IChatConversationRefer = {

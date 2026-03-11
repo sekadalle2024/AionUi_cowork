@@ -28,6 +28,8 @@ import { initWebuiBridge } from './webuiBridge';
 import { initSystemSettingsBridge } from './systemSettingsBridge';
 import { initWindowControlsBridge } from './windowControlsBridge';
 import { initExtensionsBridge } from './extensionsBridge';
+import { initN8nBridge } from './n8nBridge';
+import { initN8nConversationBridge } from './n8nConversationBridge';
 
 /**
  * 初始化所有IPC桥接模块
@@ -48,6 +50,8 @@ export function initAllBridges(): void {
   initModelBridge();
   initMcpBridge();
   initDatabaseBridge();
+  initN8nBridge();
+  initN8nConversationBridge();
   initPreviewHistoryBridge();
   initDocumentBridge();
   initWindowControlsBridge();

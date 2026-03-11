@@ -39,6 +39,12 @@ type Draft =
       content: string;
       atPath: Array<string | FileOrFolderItem>;
       uploadFile: string[];
+    }
+  | {
+      _type: 'n8n';
+      content: string;
+      atPath: Array<string | FileOrFolderItem>;
+      uploadFile: string[];
     };
 
 /**
@@ -54,6 +60,7 @@ const store: SendBoxDraftStore = {
   codex: new Map(),
   'openclaw-gateway': new Map(),
   nanobot: new Map(),
+  n8n: new Map(),
 };
 
 const setDraft = <K extends TChatConversation['type']>(type: K, conversation_id: string, draft: Extract<Draft, { _type: K }> | undefined) => {
@@ -94,6 +101,13 @@ const setDraft = <K extends TChatConversation['type']>(type: K, conversation_id:
         store.nanobot.delete(conversation_id);
       }
       break;
+    case 'n8n':
+      if (draft) {
+        store.n8n.set(conversation_id, draft as Extract<Draft, { _type: 'n8n' }>);
+      } else {
+        store.n8n.delete(conversation_id);
+      }
+      break;
     default:
       break;
   }
@@ -112,6 +126,8 @@ const getDraft = <K extends TChatConversation['type']>(type: K, conversation_id:
       return store['openclaw-gateway'].get(conversation_id) as Extract<Draft, { _type: K }>;
     case 'nanobot':
       return store.nanobot.get(conversation_id) as Extract<Draft, { _type: K }>;
+    case 'n8n':
+      return store.n8n.get(conversation_id) as Extract<Draft, { _type: K }>;
     default:
       return undefined;
   }

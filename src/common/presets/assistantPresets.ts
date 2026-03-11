@@ -305,4 +305,22 @@ export const ASSISTANT_PRESETS: AssistantPreset[] = [
       'zh-CN': ['开始一个勇敢战士的史诗奇幻冒险', '创建一个有背景故事和个性的详细角色', '在科幻设定中开始一个互动故事'],
     },
   },
+  {
+    id: 'n8n-workflow',
+    avatar: '🔄',
+    presetAgentType: 'n8n',
+    nameI18n: {
+      'en-US': 'n8n Workflow',
+      'zh-CN': 'n8n 工作流',
+    },
+    descriptionI18n: {
+      'en-US': 'Execute n8n workflows and display results in a modern chat interface.',
+      'zh-CN': '执行 n8n 工作流并在现代聊天界面中显示结果。',
+    },
+    ruleFiles: {},
+    promptsI18n: {
+      'en-US': ['Generate a work program for cash inventory', 'Analyze risks in the payroll process', 'Create an audit control checklist'],
+      'zh-CN': ['生成现金盘点的工作程序', '分析工资流程中的风险', '创建审计控制清单'],
+    },
+  },
 ];

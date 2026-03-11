@@ -25,6 +25,7 @@ import CodexChat from './codex/CodexChat';
 import NanobotChat from './nanobot/NanobotChat';
 import OpenClawChat from './openclaw/OpenClawChat';
 import GeminiChat from './gemini/GeminiChat';
+import N8nChat from './n8n/N8nChat';
 import AcpModelSelector from '@/renderer/components/AcpModelSelector';
 import GeminiModelSelector from './gemini/GeminiModelSelector';
 import { useGeminiModelSelection } from './gemini/useGeminiModelSelection';
@@ -166,6 +167,8 @@ const ChatConversation: React.FC<{
         return <OpenClawChat key={conversation.id} conversation_id={conversation.id} workspace={conversation.extra?.workspace} />;
       case 'nanobot':
         return <NanobotChat key={conversation.id} conversation_id={conversation.id} workspace={conversation.extra?.workspace} />;
+      case 'n8n':
+        return <N8nChat key={conversation.id} conversation_id={conversation.id} />;
       default:
         return null;
     }
@@ -215,7 +218,7 @@ const ChatConversation: React.FC<{
     : isLoadingPreset
       ? {} // Still loading custom agents — avoid showing backend logo prematurely
       : {
-          backend: conversation?.type === 'acp' ? conversation?.extra?.backend : conversation?.type === 'codex' ? 'codex' : conversation?.type === 'openclaw-gateway' ? 'openclaw-gateway' : conversation?.type === 'nanobot' ? 'nanobot' : undefined,
+          backend: conversation?.type === 'acp' ? conversation?.extra?.backend : conversation?.type === 'codex' ? 'codex' : conversation?.type === 'openclaw-gateway' ? 'openclaw-gateway' : conversation?.type === 'nanobot' ? 'nanobot' : conversation?.type === 'n8n' ? 'n8n' : undefined,
           agentName: (conversation?.extra as { agentName?: string })?.agentName,
         };
 

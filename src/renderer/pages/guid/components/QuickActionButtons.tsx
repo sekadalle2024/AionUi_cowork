@@ -5,7 +5,7 @@
  */
 
 import { webui } from '@/common/ipcBridge';
-import { Earth } from '@icon-park/react';
+import { Earth, Code } from '@icon-park/react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -28,7 +28,7 @@ let webuiStatusCache: {
 const QuickActionButtons: React.FC<QuickActionButtonsProps> = ({ onOpenLink, inactiveBorderColor, activeShadow }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [hoveredQuickAction, setHoveredQuickAction] = useState<'feedback' | 'repo' | 'webui' | null>(null);
+  const [hoveredQuickAction, setHoveredQuickAction] = useState<'feedback' | 'repo' | 'webui' | 'n8n' | null>(null);
   const [webuiQuickStatus, setWebuiQuickStatus] = useState<WebuiQuickStatus>('checking');
 
   useEffect(() => {
@@ -86,6 +86,10 @@ const QuickActionButtons: React.FC<QuickActionButtonsProps> = ({ onOpenLink, ina
     void navigate('/settings/webui');
   }, [navigate]);
 
+  const handleOpenN8n = useCallback(() => {
+    void navigate('/n8n-workflow');
+  }, [navigate]);
+
   const webuiStatusLabel = webuiQuickStatus === 'running' ? t('settings.webui.running', { defaultValue: 'Running' }) : webuiQuickStatus === 'checking' ? t('settings.webui.starting', { defaultValue: 'Checking' }) : webuiQuickStatus === 'error' ? t('settings.webui.operationFailed', { defaultValue: 'Unavailable' }) : t('settings.webui.enable', { defaultValue: 'Start' });
   const webuiIconColor = webuiQuickStatus === 'running' ? 'rgb(var(--success-6))' : webuiQuickStatus === 'checking' ? 'rgb(var(--primary-6))' : webuiQuickStatus === 'error' ? 'var(--color-text-3)' : 'var(--color-text-4)';
 
@@ -119,6 +123,10 @@ const QuickActionButtons: React.FC<QuickActionButtonsProps> = ({ onOpenLink, ina
           <span className='opacity-0 max-w-0 overflow-hidden text-14px text-[var(--color-text-2)] group-hover:opacity-100 group-hover:max-w-160px transition-all duration-360 ease-in-out'>
             {t('settings.webui', { defaultValue: 'WebUI' })} · {webuiStatusLabel}
           </span>
+        </div>
+        <div className='group inline-flex items-center justify-center h-36px min-w-36px max-w-36px px-0 rd-999px bg-fill-0 cursor-pointer overflow-hidden whitespace-nowrap hover:max-w-180px hover:px-14px hover:justify-start hover:gap-8px transition-[max-width,padding,border-radius,box-shadow] duration-420 ease-in-out' style={quickActionStyle(hoveredQuickAction === 'n8n')} onMouseEnter={() => setHoveredQuickAction('n8n')} onMouseLeave={() => setHoveredQuickAction(null)} onClick={handleOpenN8n}>
+          <Code theme='outline' size={20} fill='currentColor' className='flex-shrink-0 text-[var(--color-text-3)] group-hover:text-[#FF6B6B] transition-colors duration-300' />
+          <span className='opacity-0 max-w-0 overflow-hidden text-14px text-[var(--color-text-2)] group-hover:opacity-100 group-hover:max-w-140px transition-all duration-360 ease-in-out'>n8n Workflow</span>
         </div>
       </div>
     </div>

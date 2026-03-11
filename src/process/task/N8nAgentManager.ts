@@ -12,11 +12,20 @@ import { parseN8nResponse } from '@/agent/n8n/n8nResponseParser';
 export class N8nAgentManager {
   public readonly type = 'n8n';
   public readonly id: string;
+  public readonly workspace = '';
+  public readonly status = 'idle';
   private conversation: TChatConversation;
 
   constructor(conversation: TChatConversation) {
     this.id = conversation.id;
     this.conversation = conversation;
+  }
+
+  /**
+   * Send message to n8n workflow (unified interface)
+   */
+  async sendMessage({ content, msg_id }: { content: string; files?: string[]; msg_id: string }): Promise<void> {
+    await this.execute(content, msg_id);
   }
 
   /**
@@ -31,13 +40,20 @@ export class N8nAgentManager {
         // Parse n8n response to markdown
         const markdown = parseN8nResponse(result.data);
 
-        // Emit response as streaming message
+        // Emit response message
         ipcBridge.conversation.responseStream.emit({
           type: 'message',
           conversation_id: this.id,
           msg_id: msgId,
           data: markdown,
-          status: 'finished',
+        });
+
+        // Emit finish signal
+        ipcBridge.conversation.responseStream.emit({
+          type: 'finish',
+          conversation_id: this.id,
+          msg_id: msgId,
+          data: null,
         });
       } else {
         // Emit error message
@@ -47,7 +63,6 @@ export class N8nAgentManager {
           conversation_id: this.id,
           msg_id: msgId,
           data: errorMessage,
-          status: 'finished',
         });
       }
     } catch (error) {
@@ -57,7 +72,6 @@ export class N8nAgentManager {
         conversation_id: this.id,
         msg_id: msgId,
         data: errorMessage,
-        status: 'finished',
       });
     }
   }
@@ -67,6 +81,20 @@ export class N8nAgentManager {
    */
   stop(): void {
     console.log('[n8n] Stop requested (not supported)');
+  }
+
+  /**
+   * Get confirmations (n8n doesn't use confirmations)
+   */
+  getConfirmations(): any[] {
+    return [];
+  }
+
+  /**
+   * Confirm action (n8n doesn't use confirmations)
+   */
+  confirm(_msgId: string, _callId: string, _data: any): void {
+    console.log('[n8n] Confirm called (not supported)');
   }
 
   /**

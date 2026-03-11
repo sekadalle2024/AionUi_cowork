@@ -1,0 +1,119 @@
+================================================================================
+ERREUR COMPLÈTE - Problème better-sqlite3 avec Electron
+================================================================================
+
+SYMPTÔME :
+----------
+L'application AionUi ne démarre pas et affiche des erreurs répétées concernant
+le module better-sqlite3.
+
+ERREUR EXACTE :
+---------------
+Error: The module '\\?\G:\Aionui_client\node_modules\better-sqlite3\build\Release\better_sqlite3.node'
+was compiled against a different Node.js version using
+NODE_MODULE_VERSION 127. This version of Node.js requires
+NODE_MODULE_VERSION 136. Please try re-compiling or re-installing
+the module (for instance, using `npm rebuild` or `npm install`).
+    at process.func [as dlopen] (node:electron/js2c/node_init:2:2617)
+    at Module._extensions..node (node:internal/modules/cjs/loader:1874:18)
+    at Object.func [as .node] (node:electron/js2c/node_init:2:2617)
+    at Module.load (node:internal/modules/cjs/loader:1448:32)
+    at Module._load (node:internal/modules/cjs/loader:1270:12)
+    at c._load (node:electron/js2c/node_init:2:17993)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:244:24)
+    at Module.require (node:internal/modules/cjs/loader:1470:12)
+    at require (node:internal/modules/helpers:147:16)
+    at bindings (G:\Aionui_client\node_modules\bindings\bindings.js:112:48)
+    at new Database (G:\Aionui_client\node_modules\better-sqlite3\lib\database.js:48:64)
+    at new AionUIDatabase (G:\Aionui_client\out\main\index.js:4159:17)
+    at getDatabase (G:\Aionui_client\out\main\index.js:5097:18)
+
+CONTEXTE :
+----------
+- Projet : AionUi v1.8.25
+- Electron : 37.3.1 (utilise Node.js v22.x)
+- Module problématique : better-sqlite3 (module natif C++)
+- NODE_MODULE_VERSION 127 = Node.js v20.x (version compilée)
+- NODE_MODULE_VERSION 136 = Node.js v22.x (version requise par Electron)
+
+SERVICES AFFECTÉS :
+-------------------
+[Database] Initializing database - ÉCHEC
+[DatabaseBridge] Error getting user conversations - ÉCHEC
+[WebUI Service] Get status error - ÉCHEC
+[ConversationService] Failed to create conversation - ÉCHEC
+[PairingService] cleanupExpired - ÉCHEC
+[CronStore] listAll - ÉCHEC
+
+IMPACT :
+--------
+- Impossible de créer ou charger des conversations
+- Base de données inaccessible
+- Aucune donnée utilisateur ne peut être sauvegardée
+- L'application démarre mais est inutilisable
+
+FRÉQUENCE :
+-----------
+L'erreur se répète à chaque tentative d'accès à la base de données, générant
+des centaines de lignes d'erreur dans les logs.
+
+TENTATIVES ÉCHOUÉES :
+---------------------
+1. npm rebuild better-sqlite3 --build-from-source
+   → Recompile pour Node.js standard, pas Electron
+
+2. npm install (réinstallation complète)
+   → Télécharge les binaires précompilés pour Node.js standard
+
+3. Suppression de node_modules et réinstallation
+   → Même problème, binaires pour mauvaise version
+
+4. npx electron-rebuild -f -w better-sqlite3
+   → Échoue sur node-pty avec erreur Visual Studio
+
+SOLUTION QUI FONCTIONNE :
+-------------------------
+npx electron-builder install-app-deps
+
+Cette commande :
+1. Détecte automatiquement la version d'Electron (37.3.1)
+2. Identifie la version de Node.js correspondante (v22.x)
+3. Recompile better-sqlite3 pour NODE_MODULE_VERSION 136
+4. Recompile également keytar (autre module natif)
+
+RÉSULTAT APRÈS SOLUTION :
+--------------------------
+[Database] Schema initialized successfully
+[Migrations] Running 15 migrations from v0 to v15
+[Migrations] All migrations completed successfully
+[ConversationService] Created gemini conversation 4e6f2c16 with source=aionui
+
+✓ Application fonctionnelle
+✓ Base de données opérationnelle
+✓ Conversations créées avec succès
+✓ Tous les services démarrent correctement
+
+COMMANDES COMPLÈTES :
+---------------------
+# Windows PowerShell
+Remove-Item -Recurse -Force out -ErrorAction SilentlyContinue
+Remove-Item -Recurse -Force node_modules\better-sqlite3\build -ErrorAction SilentlyContinue
+npx electron-builder install-app-deps
+.\start-dev.ps1
+
+# macOS/Linux Bash
+rm -rf out
+rm -rf node_modules/better-sqlite3/build
+npx electron-builder install-app-deps
+npm start
+
+PRÉVENTION :
+------------
+Exécuter après chaque :
+- npm install (réinstallation des dépendances)
+- Mise à jour d'Electron
+- Mise à jour de better-sqlite3
+- Clone du projet sur nouvelle machine
+
+================================================================================

@@ -21,6 +21,7 @@ import { useLatestRef } from '../hooks/useLatestRef';
 import { usePasteService } from '../hooks/usePasteService';
 import type { FileMetadata } from '../services/FileService';
 import { allSupportedExts } from '../services/FileService';
+import DemarrerMenu from './DemarrerMenu';
 
 const constVoid = (): void => undefined;
 // 临界值：超过该字符数直接切换至多行模式，避免为超长文本做昂贵的宽度测量
@@ -309,6 +310,11 @@ const SendBox: React.FC<{
       });
   };
 
+  const handleInsertCommand = useCallback((command: string) => {
+    const newValue = input ? `${input}\n\n${command}` : command;
+    setInput(newValue);
+  }, [input, setInput]);
+
   const stopHandler = async () => {
     if (!onStop) return;
     try {
@@ -330,10 +336,11 @@ const SendBox: React.FC<{
     <Button
       shape='circle'
       type='primary'
+      size='mini'
       disabled={isButtonDisabled}
       className='send-button-custom'
       style={buttonStyle}
-      icon={<ArrowUp theme='filled' size='14' fill='white' strokeWidth={5} />}
+      icon={<ArrowUp theme='filled' size='12' fill='white' strokeWidth={5} />}
       onClick={() => {
         sendMessageHandler();
       }}
@@ -342,10 +349,13 @@ const SendBox: React.FC<{
 
   return (
     <div className={className}>
+      {/* Input area with send button inside - Claraverse style */}
       <div
         ref={containerRef}
-        className={`relative p-16px border-3 b bg-dialog-fill-0 b-solid rd-20px flex flex-col ${slashController.isOpen ? 'overflow-visible' : 'overflow-hidden'} ${isFileDragging ? 'b-dashed' : ''}`}
+        className={`relative p-8px border-1 b bg-dialog-fill-0 b-solid rd-8px flex items-center gap-2 ${slashController.isOpen ? 'overflow-visible' : 'overflow-hidden'} ${isFileDragging ? 'b-dashed' : ''}`}
         style={{
+          maxWidth: '66%',
+          margin: '0 auto',
           transition: 'box-shadow 0.25s ease, border-color 0.25s ease',
           ...(isFileDragging
             ? {
@@ -380,73 +390,63 @@ const SendBox: React.FC<{
             />
           </div>
         )}
-        <div style={{ width: '100%' }}>
-          {prefix}
-          {context}
-          {/* DOM 片段标签 / DOM snippet tags */}
-          {domSnippets.length > 0 && (
-            <div className='flex flex-wrap gap-6px mb-8px'>
-              {domSnippets.map((snippet) => (
-                <Tag key={snippet.id} closable closeIcon={<CloseSmall theme='outline' size='12' />} onClose={() => removeDomSnippet(snippet.id)} className='text-12px bg-fill-2 b-1 b-solid b-border-2 rd-4px'>
-                  {snippet.tag}
-                </Tag>
-              ))}
-            </div>
-          )}
-        </div>
-        <div className={isSingleLine ? 'flex items-center gap-2 w-full min-w-0 overflow-hidden' : 'w-full overflow-hidden'}>
-          {isSingleLine && <div className={isMobile ? 'sendbox-tools sendbox-tools-scroll-mobile' : 'flex-shrink-0 sendbox-tools'}>{tools}</div>}
-          <Input.TextArea
-            autoFocus={!isMobile}
-            disabled={disabled}
-            value={input}
-            placeholder={placeholder}
-            className={`pl-0 pr-0 !b-none focus:shadow-none m-0 !bg-transparent !focus:bg-transparent !hover:bg-transparent lh-[20px] !resize-none text-14px ${isMobile ? 'sendbox-input--mobile' : ''}`}
-            style={{
-              width: isSingleLine ? 'auto' : '100%',
-              flex: isSingleLine ? 1 : 'none',
-              minWidth: 0,
-              maxWidth: '100%',
-              marginLeft: 0,
-              marginRight: 0,
-              marginBottom: isSingleLine ? 0 : '8px',
-              height: isSingleLine ? '20px' : 'auto',
-              minHeight: isSingleLine ? '20px' : '80px',
-              overflowY: isSingleLine ? 'hidden' : 'auto',
-              overflowX: 'hidden',
-              whiteSpace: isSingleLine ? 'nowrap' : 'pre-wrap',
-              textOverflow: isSingleLine ? 'ellipsis' : 'clip',
-              wordBreak: isSingleLine ? 'normal' : 'break-word',
-              overflowWrap: 'break-word',
-            }}
-            onChange={(v) => {
-              setInput(v);
-            }}
-            onPaste={onPaste}
-            onTouchStart={markMobileFocusIntent}
-            onMouseDown={markMobileFocusIntent}
-            onFocus={handleInputFocus}
-            onBlur={handleInputBlur}
-            {...compositionHandlers}
-            autoSize={isSingleLine ? false : { minRows: 1, maxRows: 10 }}
-            onKeyDown={createKeyDownHandler(sendMessageHandler, slashController.onKeyDown)}
-          ></Input.TextArea>
-          {isSingleLine && (
-            <div className='flex items-center gap-2'>
-              {sendButtonPrefix}
-              {isLoading || loading ? <Button shape='circle' type='secondary' className='bg-animate' icon={<div className='mx-auto size-12px bg-6'></div>} onClick={stopHandler}></Button> : sendButton}
-            </div>
-          )}
-        </div>
-        {!isSingleLine && (
-          <div className='flex items-center justify-between gap-2 w-full'>
-            <div className={isMobile ? 'sendbox-tools sendbox-tools-scroll-mobile' : 'sendbox-tools'}>{tools}</div>
-            <div className='flex items-center gap-2'>
-              {sendButtonPrefix}
-              {isLoading || loading ? <Button shape='circle' type='secondary' className='bg-animate' icon={<div className='mx-auto size-12px bg-6'></div>} onClick={stopHandler}></Button> : sendButton}
-            </div>
+        {prefix && <div className='flex-shrink-0'>{prefix}</div>}
+        {context}
+        {/* DOM snippet tags */}
+        {domSnippets.length > 0 && (
+          <div className='flex flex-wrap gap-6px mb-8px'>
+            {domSnippets.map((snippet) => (
+              <Tag key={snippet.id} closable closeIcon={<CloseSmall theme='outline' size='12' />} onClose={() => removeDomSnippet(snippet.id)} className='text-12px bg-fill-2 b-1 b-solid b-border-2 rd-4px'>
+                {snippet.tag}
+              </Tag>
+            ))}
           </div>
         )}
+        {/* Textarea - flex to fill space */}
+        <Input.TextArea
+          autoFocus={!isMobile}
+          disabled={disabled}
+          value={input}
+          placeholder={placeholder}
+          className={`pl-0 pr-0 !b-none focus:shadow-none m-0 !bg-transparent !focus:bg-transparent !hover:bg-transparent lh-[20px] !resize-none text-14px ${isMobile ? 'sendbox-input--mobile' : ''}`}
+          style={{
+            flex: 1,
+            minWidth: 0,
+            marginLeft: 0,
+            marginRight: 0,
+            marginBottom: 0,
+            height: '20px',
+            minHeight: '20px',
+            overflowY: 'hidden',
+            overflowX: 'hidden',
+            whiteSpace: 'nowrap',
+            textOverflow: 'ellipsis',
+            wordBreak: 'normal',
+            overflowWrap: 'break-word',
+          }}
+          onChange={(v) => {
+            setInput(v);
+          }}
+          onPaste={onPaste}
+          onTouchStart={markMobileFocusIntent}
+          onMouseDown={markMobileFocusIntent}
+          onFocus={handleInputFocus}
+          onBlur={handleInputBlur}
+          {...compositionHandlers}
+          autoSize={false}
+          onKeyDown={createKeyDownHandler(sendMessageHandler, slashController.onKeyDown)}
+        ></Input.TextArea>
+        {/* Send button inside input area on the right */}
+        <div className='flex-shrink-0'>
+          {sendButtonPrefix}
+          {isLoading || loading ? <Button shape='circle' size='mini' type='secondary' className='bg-animate' icon={<div className='mx-auto size-10px bg-6'></div>} onClick={stopHandler}></Button> : sendButton}
+        </div>
+      </div>
+      
+      {/* Action buttons below - Claraverse style */}
+      <div className='flex items-center justify-center gap-3 w-full mt-8px'>
+        <DemarrerMenu onInsertCommand={handleInsertCommand} disabled={disabled} />
+        {tools}
       </div>
     </div>
   );

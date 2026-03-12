@@ -7,8 +7,8 @@
 import type { IMessageText } from '@/common/chatLib';
 import { AIONUI_FILES_MARKER } from '@/common/constants';
 import { iconColors } from '@/renderer/theme/colors';
-import { Alert, Message, Tooltip } from '@arco-design/web-react';
-import { Copy } from '@icon-park/react';
+import { Alert, Avatar, Message, Tooltip } from '@arco-design/web-react';
+import { Copy, User, Robot } from '@icon-park/react';
 import classNames from 'classnames';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -97,48 +97,77 @@ const MessageText: React.FC<{ message: IMessageText }> = ({ message }) => {
 
   const cronMeta = message.content.cronMeta;
 
+  // Render avatar based on message position
+  const renderAvatar = () => {
+    if (isUserMessage) {
+      // User avatar
+      return (
+        <Avatar size={32} className='flex-shrink-0' style={{ backgroundColor: 'var(--color-fill-2)' }}>
+          <User theme='outline' size='18' fill={iconColors.secondary} />
+        </Avatar>
+      );
+    } else {
+      // System avatar (E-audit) - using Robot icon as fallback
+      return (
+        <Avatar size={32} className='flex-shrink-0' style={{ backgroundColor: 'var(--color-fill-2)' }}>
+          <Robot theme='outline' size='18' fill={iconColors.primary} />
+        </Avatar>
+      );
+    }
+  };
+
+  // Render name label
+  const renderNameLabel = () => {
+    const name = isUserMessage ? 'User' : 'E-audit';
+    return <div className='text-12px text-t-secondary mb-4px font-medium'>{name}</div>;
+  };
+
   return (
     <>
-      <div className={classNames('min-w-0 flex flex-col group', isUserMessage ? 'items-end' : 'items-start')}>
-        {cronMeta && <MessageCronBadge meta={cronMeta} />}
-        {files.length > 0 && (
-          <div className={classNames('mt-6px', { 'self-end': isUserMessage })}>
-            {files.length === 1 ? (
-              <div className='flex items-center'>
-                <FilePreview path={files[0]} onRemove={() => undefined} readonly />
-              </div>
+      <div className={classNames('min-w-0 flex gap-8px group w-full', isUserMessage ? 'flex-row-reverse' : 'flex-row')}>
+        {renderAvatar()}
+        <div className={classNames('min-w-0 flex flex-col flex-1', isUserMessage ? 'items-end' : 'items-start')}>
+          {renderNameLabel()}
+          {cronMeta && <MessageCronBadge meta={cronMeta} />}
+          {files.length > 0 && (
+            <div className={classNames('mt-6px', { 'self-end': isUserMessage })}>
+              {files.length === 1 ? (
+                <div className='flex items-center'>
+                  <FilePreview path={files[0]} onRemove={() => undefined} readonly />
+                </div>
+              ) : (
+                <HorizontalFileList>
+                  {files.map((path) => (
+                    <FilePreview key={path} path={path} onRemove={() => undefined} readonly />
+                  ))}
+                </HorizontalFileList>
+              )}
+            </div>
+          )}
+          <div
+            className={classNames('min-w-0 [&>p:first-child]:mt-0px [&>p:last-child]:mb-0px md:max-w-780px', {
+              'bg-aou-2 p-8px': isUserMessage || cronMeta,
+              'w-full': !(isUserMessage || cronMeta),
+            })}
+            style={isUserMessage || cronMeta ? { borderRadius: '8px 0 8px 8px' } : undefined}
+          >
+            {/* JSON 内容使用折叠组件 Use CollapsibleContent for JSON content */}
+            {json ? (
+              <CollapsibleContent maxHeight={200} defaultCollapsed={true}>
+                <MarkdownView codeStyle={{ marginTop: 4, marginBlock: 4 }}>{`\`\`\`json\n${JSON.stringify(data, null, 2)}\n\`\`\``}</MarkdownView>
+              </CollapsibleContent>
             ) : (
-              <HorizontalFileList>
-                {files.map((path) => (
-                  <FilePreview key={path} path={path} onRemove={() => undefined} readonly />
-                ))}
-              </HorizontalFileList>
+              <MarkdownView codeStyle={{ marginTop: 4, marginBlock: 4 }}>{data}</MarkdownView>
             )}
           </div>
-        )}
-        <div
-          className={classNames('min-w-0 [&>p:first-child]:mt-0px [&>p:last-child]:mb-0px md:max-w-780px', {
-            'bg-aou-2 p-8px': isUserMessage || cronMeta,
-            'w-full': !(isUserMessage || cronMeta),
-          })}
-          style={isUserMessage || cronMeta ? { borderRadius: '8px 0 8px 8px' } : undefined}
-        >
-          {/* JSON 内容使用折叠组件 Use CollapsibleContent for JSON content */}
-          {json ? (
-            <CollapsibleContent maxHeight={200} defaultCollapsed={true}>
-              <MarkdownView codeStyle={{ marginTop: 4, marginBlock: 4 }}>{`\`\`\`json\n${JSON.stringify(data, null, 2)}\n\`\`\``}</MarkdownView>
-            </CollapsibleContent>
-          ) : (
-            <MarkdownView codeStyle={{ marginTop: 4, marginBlock: 4 }}>{data}</MarkdownView>
-          )}
-        </div>
-        <div
-          className={classNames('h-32px flex items-center mt-4px', {
-            'justify-end': isUserMessage,
-            'justify-start': !isUserMessage,
-          })}
-        >
-          {copyButton}
+          <div
+            className={classNames('h-32px flex items-center mt-4px', {
+              'justify-end': isUserMessage,
+              'justify-start': !isUserMessage,
+            })}
+          >
+            {copyButton}
+          </div>
         </div>
       </div>
       {showCopyAlert && <Alert type='success' content={t('messages.copySuccess')} showIcon className='fixed top-20px left-50% transform -translate-x-50% z-9999 w-max max-w-[80%]' style={{ boxShadow: '0px 2px 12px rgba(0,0,0,0.12)' }} closable={false} />}

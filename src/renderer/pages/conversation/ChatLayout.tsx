@@ -403,13 +403,12 @@ const ChatLayout: React.FC<{
     <>
       <ConversationTabs />
       <ArcoLayout.Header className={classNames('h-36px flex items-center justify-between p-16px gap-16px !bg-1 chat-layout-header overflow-hidden', layout?.isMobile && 'chat-layout-header--mobile-unified')}>
-        <div className='shrink-0'>{props.headerLeft}</div>
+        <div className='shrink-0'></div>
         <FlexFullContainer className='h-full min-w-0' containerClassName='flex items-center gap-16px'>
           {!layout?.isMobile && !hasTabs && <span className='font-bold text-16px text-t-primary inline-block overflow-hidden text-ellipsis whitespace-nowrap max-w-full'>{props.title}</span>}
         </FlexFullContainer>
         <div className='flex items-center gap-12px shrink-0'>
           {props.headerExtra}
-          {(backend || agentLogo) && <AgentModeSelector backend={backend} agentName={displayName} agentLogo={agentLogo} agentLogoIsEmoji={agentLogoIsEmoji} compact={Boolean(layout?.isMobile)} showLogoInCompact={Boolean(layout?.isMobile)} compactLabelType={layout?.isMobile ? 'agent' : 'mode'} />}
           {isWindowsRuntime && workspaceEnabled && (
             <button type='button' className='workspace-header__toggle' aria-label='Toggle workspace' onClick={() => dispatchWorkspaceToggleEvent()}>
               {rightSiderCollapsed ? <ExpandRight size={16} /> : <ExpandLeft size={16} />}

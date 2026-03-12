@@ -508,6 +508,10 @@ export const useGuidAgentSelection = ({ modelList, isGoogleAuth, localeKey }: Us
       if (agentType === 'gemini') {
         return isGoogleAuth || (modelList != null && modelList.length > 0);
       }
+      // n8n is always considered available (health check happens at conversation creation)
+      if (agentType === 'n8n') {
+        return true;
+      }
       return availableAgents?.some((agent) => agent.backend === agentType) ?? false;
     },
     [modelList, availableAgents, isGoogleAuth]

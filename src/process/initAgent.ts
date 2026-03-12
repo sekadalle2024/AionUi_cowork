@@ -186,3 +186,21 @@ export const createOpenClawAgent = async (options: ICreateConversationParams): P
     id: uuid(),
   };
 };
+
+export const createN8nAgent = async (options: ICreateConversationParams): Promise<TChatConversation> => {
+  const { extra } = options;
+  const { workspace, customWorkspace } = await buildWorkspaceWidthFiles(`n8n-temp-${Date.now()}`, extra.workspace, extra.defaultFiles, extra.customWorkspace);
+  return {
+    type: 'n8n',
+    extra: {
+      workspace: workspace,
+      customWorkspace,
+      enabledSkills: extra.enabledSkills,
+      presetAssistantId: extra.presetAssistantId,
+    },
+    createTime: Date.now(),
+    modifyTime: Date.now(),
+    name: workspace,
+    id: uuid(),
+  };
+};

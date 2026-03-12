@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ipcBridge } from '../../common';
-
 /**
  * n8n conversation bridge
  * Handles n8n workflow execution through conversation interface

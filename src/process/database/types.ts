@@ -189,6 +189,15 @@ export function rowToConversation(row: IConversationRow): TChatConversation {
     } as TChatConversation;
   }
 
+  // n8n type
+  if (row.type === 'n8n') {
+    return {
+      ...base,
+      type: 'n8n' as const,
+      extra: JSON.parse(row.extra),
+    } as TChatConversation;
+  }
+
   // Unknown type - should never happen with valid data
   throw new Error(`Unknown conversation type: ${row.type}`);
 }

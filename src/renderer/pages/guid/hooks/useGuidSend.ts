@@ -257,6 +257,50 @@ export const useGuidSend = (deps: GuidSendDeps): GuidSendResult => {
       return;
     }
 
+    // n8n path
+    if (selectedAgent === 'n8n' || (isPreset && finalEffectiveAgentType === 'n8n')) {
+      try {
+        const conversation = await ipcBridge.conversation.create.invoke({
+          type: 'n8n',
+          name: input,
+          model: currentModel!,
+          extra: {
+            defaultFiles: files,
+            workspace: finalWorkspace,
+            customWorkspace: isCustomWorkspace,
+            enabledSkills: isPreset ? enabledSkills : undefined,
+            presetAssistantId: isPreset ? agentInfo?.customAgentId : undefined,
+          },
+        });
+
+        if (!conversation || !conversation.id) {
+          alert('Failed to create n8n conversation. Please ensure n8n backend is running on port 3458.');
+          return;
+        }
+
+        if (isCustomWorkspace) {
+          closeAllTabs();
+          updateWorkspaceTime(finalWorkspace);
+          openTab(conversation);
+        }
+
+        emitter.emit('chat.history.refresh');
+
+        const initialMessage = {
+          input,
+          files: files.length > 0 ? files : undefined,
+        };
+        sessionStorage.setItem(`n8n_initial_message_${conversation.id}`, JSON.stringify(initialMessage));
+
+        await navigate(`/conversation/${conversation.id}`);
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        alert(`Failed to create n8n conversation: ${errorMessage}`);
+        throw error;
+      }
+      return;
+    }
+
     // ACP path (including preset with claude agent type)
     {
       // Agent-type fallback only applies to preset assistants whose primary agent

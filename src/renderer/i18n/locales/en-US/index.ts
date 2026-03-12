@@ -20,6 +20,7 @@ import gemini from './gemini.json';
 import cron from './cron.json';
 import guid from './guid.json';
 import agent from './agent.json';
+import demarrer from './demarrer.json';
 
 export default {
   common,
@@ -39,4 +40,5 @@ export default {
   cron,
   guid,
   agent,
+  demarrer,
 };

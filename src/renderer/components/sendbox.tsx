@@ -310,10 +310,13 @@ const SendBox: React.FC<{
       });
   };
 
-  const handleInsertCommand = useCallback((command: string) => {
-    const newValue = input ? `${input}\n\n${command}` : command;
-    setInput(newValue);
-  }, [input, setInput]);
+  const handleInsertCommand = useCallback(
+    (command: string) => {
+      const newValue = input ? `${input}\n\n${command}` : command;
+      setInput(newValue);
+    },
+    [input, setInput]
+  );
 
   const stopHandler = async () => {
     if (!onStop) return;
@@ -442,7 +445,7 @@ const SendBox: React.FC<{
           {isLoading || loading ? <Button shape='circle' size='mini' type='secondary' className='bg-animate' icon={<div className='mx-auto size-10px bg-6'></div>} onClick={stopHandler}></Button> : sendButton}
         </div>
       </div>
-      
+
       {/* Action buttons below - Claraverse style */}
       <div className='flex items-center justify-center gap-3 w-full mt-8px'>
         <DemarrerMenu onInsertCommand={handleInsertCommand} disabled={disabled} />

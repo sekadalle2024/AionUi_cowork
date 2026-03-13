@@ -1,12 +1,12 @@
-appId: com.aionui.app
-productName: AionUi
-executableName: AionUi
-copyright: Copyright © 2024 AionUi
+appId: com.eaudit.app
+productName: E-audit
+executableName: E-audit
+copyright: Copyright © 2024 E-audit
 
 protocols:
-  - name: AionUi Protocol
+  - name: E-audit Protocol
     schemes:
-      - aionui
+      - eaudit
 
 asar:
   smartUnpack: true
@@ -168,11 +168,11 @@ linux:
   description: ${description}
   desktop:
     entry:
-      Name: AionUi
+      Name: E-audit
       Comment: ${description}
-      Icon: aionui
+      Icon: eaudit
       Categories: Office;Utility;
-      MimeType: x-scheme-handler/aionui;
+      MimeType: x-scheme-handler/eaudit;
 
 npmRebuild: false
 buildDependenciesFromSource: false
@@ -212,6 +212,6 @@ electronDownload:
 publish:
   provider: github
   owner: iOfficeAI
-  repo: AionUi
+  repo: E-audit
   publishAutoUpdate: true
   releaseType: release

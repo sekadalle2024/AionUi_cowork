@@ -300,7 +300,7 @@ export async function verifyDirectoryFiles(dir1: string, dir2: string): Promise<
 
     return true;
   } catch (error) {
-    console.warn('[AionUi] Error verifying directory files:', error);
+    console.warn('[E-audit] Error verifying directory files:', error);
     return false;
   }
 }
@@ -321,8 +321,8 @@ export const copyFilesToDirectory = async (dir: string, files?: string[], skipCl
     try {
       await fs.access(absoluteFilePath);
     } catch (error) {
-      console.warn(`[AionUi] Source file does not exist, skipping: ${absoluteFilePath}`);
-      console.warn(`[AionUi] Original path: ${file}`);
+      console.warn(`[E-audit] Source file does not exist, skipping: ${absoluteFilePath}`);
+      console.warn(`[E-audit] Original path: ${file}`);
       // 跳过不存在的文件，而不是抛出错误
       continue;
     }
@@ -353,7 +353,7 @@ export const copyFilesToDirectory = async (dir: string, files?: string[], skipCl
       await fs.copyFile(absoluteFilePath, destPath);
       copiedFiles.push(destPath);
     } catch (error) {
-      console.error(`[AionUi] Failed to copy file from ${absoluteFilePath} to ${destPath}:`, error);
+      console.error(`[E-audit] Failed to copy file from ${absoluteFilePath} to ${destPath}:`, error);
       // 继续处理其他文件，而不是完全失败
     }
 

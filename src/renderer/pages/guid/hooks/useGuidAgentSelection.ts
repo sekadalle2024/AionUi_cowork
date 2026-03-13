@@ -79,7 +79,7 @@ type UseGuidAgentSelectionOptions = {
  * Hook that manages agent selection, availability, and preset assistant logic.
  */
 export const useGuidAgentSelection = ({ modelList, isGoogleAuth, localeKey }: UseGuidAgentSelectionOptions): GuidAgentSelectionResult => {
-  const [selectedAgentKey, _setSelectedAgentKey] = useState<string>('gemini');
+  const [selectedAgentKey, _setSelectedAgentKey] = useState<string>('custom:builtin-n8n-workflow');
   const [availableAgents, setAvailableAgents] = useState<AvailableAgent[]>();
   const [customAgents, setCustomAgents] = useState<AcpBackendConfig[]>([]);
   const [selectedMode, _setSelectedMode] = useState<string>('default');

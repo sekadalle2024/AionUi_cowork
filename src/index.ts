@@ -102,7 +102,7 @@ const isE2ETestMode = process.env.AIONUI_E2E_TEST === '1';
 const deepLinkFromArgv = process.argv.find((arg) => arg.startsWith(`${PROTOCOL_SCHEME}://`));
 const gotTheLock = isE2ETestMode ? true : app.requestSingleInstanceLock({ deepLinkUrl: deepLinkFromArgv });
 if (!gotTheLock) {
-  console.warn('[AionUi] Another instance is already running; current process will exit.');
+  console.warn('[E-audit] Another instance is already running; current process will exit.');
   app.quit();
 } else {
   app.on('second-instance', (_event, argv, _workingDirectory, additionalData) => {
@@ -133,7 +133,7 @@ if (!gotTheLock) {
     }
 
     if (app.isReady()) {
-      console.log('[AionUi] second-instance received with no active window, recreating main window');
+      console.log('[E-audit] second-instance received with no active window, recreating main window');
       createWindow();
     }
   });
@@ -357,7 +357,7 @@ const createOrUpdateTray = (): void => {
   try {
     const icon = getTrayIcon();
     tray = new Tray(icon);
-    tray.setToolTip('AionUi');
+    tray.setToolTip('E-audit');
     tray.setContextMenu(buildTrayContextMenu());
 
     // 双击托盘图标显示窗口（Windows/Linux）/ Double-click tray icon to show window (Windows/Linux)
@@ -392,7 +392,7 @@ const destroyTray = (): void => {
 };
 
 const createWindow = (): void => {
-  console.log('[AionUi] Creating main window...');
+  console.log('[E-audit] Creating main window...');
   // Get primary display size
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width: screenWidth, height: screenHeight } = primaryDisplay.workAreaSize;
@@ -439,25 +439,25 @@ const createWindow = (): void => {
       webviewTag: true, // 启用 webview 标签用于 HTML 预览 / Enable webview tag for HTML preview
     },
   });
-  console.log(`[AionUi] Main window created (id=${mainWindow.id})`);
+  console.log(`[E-audit] Main window created (id=${mainWindow.id})`);
 
   // Show window after content is ready to prevent FOUC (Flash of Unstyled Content)
   // Use 'ready-to-show' which fires when renderer has painted first frame,
   // combined with 'did-finish-load' as belt-and-suspenders approach.
   const showWindow = () => {
     if (!mainWindow.isDestroyed() && !mainWindow.isVisible()) {
-      console.log('[AionUi] Showing main window');
+      console.log('[E-audit] Showing main window');
       mainWindow.show();
       mainWindow.focus();
     }
   };
   mainWindow.once('ready-to-show', () => {
-    console.log('[AionUi] Window ready-to-show');
+    console.log('[E-audit] Window ready-to-show');
     showWindow();
   });
   // Belt-and-suspenders: also show on did-finish-load in case ready-to-show already fired
   mainWindow.webContents.once('did-finish-load', () => {
-    console.log('[AionUi] Renderer did-finish-load');
+    console.log('[E-audit] Renderer did-finish-load');
     showWindow();
   });
   // Fallback: show window after 5s even if events don't fire (e.g. loadURL failure)
@@ -488,7 +488,7 @@ const createWindow = (): void => {
         console.error('[App] Failed to initialize autoUpdaterService:', error);
       });
   } else {
-    console.log('[AionUi] Auto-updater disabled via env/CI guard');
+    console.log('[E-audit] Auto-updater disabled via env/CI guard');
   }
 
   // Load the renderer: dev server URL in development, built HTML file in production
@@ -496,34 +496,34 @@ const createWindow = (): void => {
   const fallbackFile = path.join(__dirname, '../renderer/index.html');
 
   if (!app.isPackaged && rendererUrl) {
-    console.log(`[AionUi] Loading renderer URL: ${rendererUrl}`);
+    console.log(`[E-audit] Loading renderer URL: ${rendererUrl}`);
     mainWindow.loadURL(rendererUrl).catch((error) => {
-      console.error('[AionUi] loadURL failed, falling back to file:', error.message || error);
+      console.error('[E-audit] loadURL failed, falling back to file:', error.message || error);
       mainWindow.loadFile(fallbackFile).catch((e2) => {
-        console.error('[AionUi] loadFile fallback also failed:', e2.message || e2);
+        console.error('[E-audit] loadFile fallback also failed:', e2.message || e2);
       });
     });
   } else {
-    console.log(`[AionUi] Loading renderer file: ${fallbackFile}`);
+    console.log(`[E-audit] Loading renderer file: ${fallbackFile}`);
     mainWindow.loadFile(fallbackFile).catch((error) => {
-      console.error('[AionUi] loadFile failed:', error.message || error);
+      console.error('[E-audit] loadFile failed:', error.message || error);
     });
   }
 
   mainWindow.webContents.on('did-fail-load', (_event, errorCode, errorDescription, validatedURL, isMainFrame) => {
-    console.error('[AionUi] did-fail-load:', { errorCode, errorDescription, validatedURL, isMainFrame });
+    console.error('[E-audit] did-fail-load:', { errorCode, errorDescription, validatedURL, isMainFrame });
   });
 
   mainWindow.webContents.on('render-process-gone', (_event, details) => {
-    console.error('[AionUi] render-process-gone:', details);
+    console.error('[E-audit] render-process-gone:', details);
   });
 
   mainWindow.webContents.on('unresponsive', () => {
-    console.warn('[AionUi] Renderer became unresponsive');
+    console.warn('[E-audit] Renderer became unresponsive');
   });
 
   mainWindow.on('closed', () => {
-    console.log('[AionUi] Main window closed');
+    console.log('[E-audit] Main window closed');
   });
 
   // 只在开发环境自动打开 DevTools / Only auto-open DevTools in development
@@ -594,7 +594,7 @@ ipcBridge.application.openDevTools.provider(() => {
 });
 
 const handleAppReady = async (): Promise<void> => {
-  console.log('[AionUi] app.whenReady resolved');
+  console.log('[E-audit] app.whenReady resolved');
 
   // CLI mode: print app version and exit immediately (used by CI smoke tests)
   if (isVersionMode) {
@@ -838,7 +838,7 @@ app.on('activate', () => {
 });
 
 app.on('before-quit', async () => {
-  console.log('[AionUi] before-quit');
+  console.log('[E-audit] before-quit');
   isQuitting = true;
   isExplicitQuit = true;
   destroyTray();
@@ -855,11 +855,11 @@ app.on('before-quit', async () => {
 });
 
 app.on('will-quit', () => {
-  console.log('[AionUi] will-quit');
+  console.log('[E-audit] will-quit');
 });
 
 app.on('quit', (_event, exitCode) => {
-  console.log(`[AionUi] quit (exitCode=${exitCode})`);
+  console.log(`[E-audit] quit (exitCode=${exitCode})`);
 });
 
 // In this file you can include the rest of your app's specific main process

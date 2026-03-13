@@ -6,7 +6,7 @@
 
 import React from 'react';
 import MessageList from '@renderer/messages/MessageList';
-import { MessageListProvider } from '@renderer/messages/hooks';
+import { MessageListProvider, useMessageLstCache } from '@renderer/messages/hooks';
 import HOC from '@renderer/utils/HOC';
 import FlexFullContainer from '@renderer/components/FlexFullContainer';
 import N8nSendBox from './N8nSendBox';
@@ -14,6 +14,8 @@ import N8nSendBox from './N8nSendBox';
 const N8nChat: React.FC<{
   conversation_id: string;
 }> = ({ conversation_id }) => {
+  useMessageLstCache(conversation_id);
+
   return (
     <div className='flex-1 flex flex-col px-20px'>
       <FlexFullContainer>

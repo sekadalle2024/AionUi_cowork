@@ -41,5 +41,52 @@
     </script>
     <div id="root"></div>
     <script type="module" src="./index.ts"></script>
+    
+    <!-- AIONUI Table Scripts - Load after React app initialization -->
+    <script>
+      // Load table enhancer and context menu scripts asynchronously after DOM and React are ready
+      (function() {
+        function loadTableScripts() {
+          // Check if React app is mounted (root element has content)
+          const root = document.getElementById('root');
+          if (root && root.children.length > 0) {
+            // React app is mounted, load the scripts
+            
+            // Load table enhancer
+            const enhancerScript = document.createElement('script');
+            enhancerScript.src = '../scripts/aionui-table-enhancer.js';
+            enhancerScript.async = true;
+            enhancerScript.onload = function() {
+              console.log('✅ AIONUI Table Enhancer loaded successfully');
+            };
+            enhancerScript.onerror = function() {
+              console.warn('⚠️ Failed to load AIONUI Table Enhancer');
+            };
+            document.head.appendChild(enhancerScript);
+            
+            // Load context menu (with slight delay to ensure enhancer loads first)
+            setTimeout(() => {
+              const contextMenuScript = document.createElement('script');
+              contextMenuScript.src = '../scripts/aionui-context-menu.js';
+              contextMenuScript.async = true;
+              contextMenuScript.onload = function() {
+                console.log('✅ AIONUI Context Menu loaded successfully');
+              };
+              contextMenuScript.onerror = function() {
+                console.warn('⚠️ Failed to load AIONUI Context Menu');
+              };
+              document.head.appendChild(contextMenuScript);
+            }, 200);
+            
+          } else {
+            // React app not ready yet, retry after a short delay
+            setTimeout(loadTableScripts, 100);
+          }
+        }
+        
+        // Start loading process after a brief delay to ensure DOM is ready
+        setTimeout(loadTableScripts, 500);
+      })();
+    </script>
   </body>
 </html>

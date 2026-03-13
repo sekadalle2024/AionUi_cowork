@@ -8,40 +8,10 @@ import { uuid } from '@/common/utils';
 import SendBox from '@/renderer/components/sendbox';
 import { useAddOrUpdateMessage } from '@/renderer/messages/hooks';
 import { Message } from '@arco-design/web-react';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { parseN8nResponse } from '@/agent/n8n/n8nResponseParser';
 import type { TMessage } from '@/common/chatLib';
-
-const BACKEND_URL = 'http://localhost:3458/api/n8n/execute';
-
-/**
- * Send request to n8n backend
- */
-async function sendN8nRequest(userMessage: string, attachments?: any[]): Promise<any> {
-  const response = await fetch(BACKEND_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      userMessage,
-      attachments,
-    }),
-  });
-
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-
-  const result = await response.json();
-
-  if (!result.success) {
-    throw new Error(result.error || "Échec de l'exécution du workflow n8n");
-  }
-
-  return result.data;
-}
+import { ipcBridge } from '@/common';
 
 const N8nSendBox: React.FC<{
   conversation_id: string;
@@ -51,64 +21,77 @@ const N8nSendBox: React.FC<{
   const [sending, setSending] = useState(false);
   const [input, setInput] = useState('');
 
+  // Listen to n8n response stream
+  useEffect(() => {
+    return ipcBridge.conversation.responseStream.on((message) => {
+      if (conversation_id !== message.conversation_id) {
+        return;
+      }
+
+      if (message.type === 'message') {
+        // Update assistant message with n8n response
+        addOrUpdateMessage({
+          id: message.msg_id,
+          msg_id: message.msg_id,
+          type: 'text',
+          position: 'left',
+          conversation_id,
+          content: {
+            content: message.data,
+          },
+          createdAt: Date.now(),
+        } as TMessage);
+      } else if (message.type === 'error') {
+        // Update with error message
+        addOrUpdateMessage({
+          id: message.msg_id,
+          msg_id: message.msg_id,
+          type: 'text',
+          position: 'left',
+          conversation_id,
+          content: {
+            content: message.data,
+          },
+          createdAt: Date.now(),
+        } as TMessage);
+      } else if (message.type === 'finish') {
+        // Stop loading state
+        setSending(false);
+      }
+    });
+  }, [conversation_id, addOrUpdateMessage]);
+
   const handleSend = useCallback(
     async (content: string) => {
       if (!content.trim() || sending) return;
 
       setSending(true);
 
-      // Add user message
-      const userMsgId = uuid();
-      addOrUpdateMessage(
-        {
-          id: userMsgId,
-          type: 'text',
-          position: 'right',
-          conversation_id,
-          content: {
-            content,
-          },
-          createdAt: Date.now(),
-        } as TMessage,
-        true
-      );
+      const msg_id = uuid();
 
-      // Add assistant message placeholder
-      const assistantMsgId = uuid();
-      addOrUpdateMessage(
-        {
-          id: assistantMsgId,
-          type: 'text',
-          position: 'left',
-          conversation_id,
-          content: {
-            content: '⏳ Exécution du workflow n8n...\n\n*Cela peut prendre plusieurs minutes pour les tâches complexes.*',
-          },
-          createdAt: Date.now(),
-        } as TMessage,
-        true
-      );
+      // Add assistant message placeholder for immediate UI feedback
+      addOrUpdateMessage({
+        id: msg_id,
+        msg_id,
+        type: 'text',
+        position: 'left',
+        conversation_id,
+        content: {
+          content: '⏳ Exécution du workflow n8n...\n\n*Cela peut prendre plusieurs minutes pour les tâches complexes.*',
+        },
+        createdAt: Date.now(),
+      } as TMessage, true);
 
       try {
-        // Call backend
-        const responseData = await sendN8nRequest(content);
-
-        // Parse response to markdown
-        const markdown = parseN8nResponse(responseData);
-
-        // Update assistant message
-        addOrUpdateMessage({
-          id: assistantMsgId,
-          type: 'text',
-          position: 'left',
+        // Send message via IPC bridge (this will save to database via N8nAgentManager)
+        await ipcBridge.conversation.sendMessage.invoke({
           conversation_id,
-          content: {
-            content: markdown,
-          },
-          createdAt: Date.now(),
-        } as TMessage);
+          input: content,
+          msg_id,
+          files: [],
+        });
       } catch (error) {
-        // Update with error message
+        // Handle error
         const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
 
         let troubleshooting = '';
@@ -119,7 +102,8 @@ const N8nSendBox: React.FC<{
         }
 
         addOrUpdateMessage({
-          id: assistantMsgId,
+          id: msg_id,
+          msg_id,
           type: 'text',
           position: 'left',
           conversation_id,
@@ -130,7 +114,6 @@ const N8nSendBox: React.FC<{
         } as TMessage);
 
         Message.error(t('Failed to execute n8n workflow'));
-      } finally {
         setSending(false);
       }
     },

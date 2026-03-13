@@ -20,5 +20,40 @@
   </style>
   <body>
     <div id="root"></div>
+    
+    <!-- AIONUI Table Enhancement Scripts -->
+    <!-- Load after React app initialization to avoid conflicts -->
+    <script>
+      // Wait for React app to be fully loaded
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          // Load Table Enhancer (Flowise)
+          const tableEnhancerScript = document.createElement('script');
+          tableEnhancerScript.src = './scripts/aionui_flowise.js';
+          tableEnhancerScript.async = true;
+          tableEnhancerScript.onload = function() {
+            console.log('✅ AIONUI Flowise loaded');
+          };
+          tableEnhancerScript.onerror = function() {
+            console.error('❌ Failed to load AIONUI Flowise');
+          };
+          document.head.appendChild(tableEnhancerScript);
+          
+          // Load Context Menu (after a small delay)
+          setTimeout(function() {
+            const contextMenuScript = document.createElement('script');
+            contextMenuScript.src = './scripts/aionui_menu.js';
+            contextMenuScript.async = true;
+            contextMenuScript.onload = function() {
+              console.log('✅ AIONUI Menu loaded');
+            };
+            contextMenuScript.onerror = function() {
+              console.error('❌ Failed to load AIONUI Menu');
+            };
+            document.head.appendChild(contextMenuScript);
+          }, 500);
+        }, 1000);
+      });
+    </script>
   </body>
 </html>

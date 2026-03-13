@@ -22,6 +22,7 @@ import { processCustomCss } from './utils/customCssProcessor';
 import { cleanupSiderTooltips } from './utils/siderTooltip';
 import { isElectronDesktop } from './utils/platform';
 import { computeCssSyncDecision, resolveCssByActiveTheme } from './utils/themeCssSync';
+import logoImage from '@renderer/assets/logo.png';
 
 const useDebug = () => {
   const [count, setCount] = useState(0);
@@ -298,6 +299,13 @@ const Layout: React.FC<{
                 'cursor-pointer group ': collapsed,
               })}
             >
+              <img
+                src={logoImage}
+                alt='E-audit'
+                className={classNames('shrink-0 object-contain collapsed-hidden', {
+                  'w-6 h-6': !collapsed,
+                })}
+              />
               <div className='flex-1 text-20px text-1 collapsed-hidden font-bold'>E-audit</div>
               {isMobile && !collapsed && (
                 <button type='button' className='app-titlebar__button' onClick={() => setCollapsed(true)} aria-label='Collapse sidebar'>

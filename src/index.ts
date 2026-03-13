@@ -529,13 +529,11 @@ const createWindow = (): void => {
     console.log('[E-audit] Main window closed');
   });
 
-  // DevTools can be opened manually with F12 or via the debug menu
-  // Auto-open is disabled to avoid cluttering the screen on startup
-  // Uncomment the lines below to enable auto-open in development:
-  // const disableDevToolsByEnv = process.env.AIONUI_DISABLE_DEVTOOLS === '1' || process.env.AIONUI_E2E_TEST === '1';
-  // if (!app.isPackaged && !disableDevToolsByEnv) {
-  //   mainWindow.webContents.openDevTools();
-  // }
+  // DevTools auto-open enabled for debugging
+  const disableDevToolsByEnv = process.env.AIONUI_DISABLE_DEVTOOLS === '1' || process.env.AIONUI_E2E_TEST === '1';
+  if (!app.isPackaged && !disableDevToolsByEnv) {
+    mainWindow.webContents.openDevTools();
+  }
 
   // Listen to DevTools state changes and notify Renderer
   mainWindow.webContents.on('devtools-opened', () => {

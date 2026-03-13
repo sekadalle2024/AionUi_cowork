@@ -6,6 +6,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { Message } from '@arco-design/web-react';
+import { useTablePersistence } from '@renderer/hooks/useTablePersistence';
 
 type MenuPosition = { x: number; y: number };
 
@@ -16,26 +17,17 @@ export const TableContextMenu: React.FC = () => {
   const [activeCell, setActiveCell] = useState<HTMLTableCellElement | null>(null);
   const [showFloatingButton, setShowFloatingButton] = useState(false);
 
-  // Verify component is mounted
-  useEffect(() => {
-    console.log('✅ TableContextMenu mounted');
-  }, []);
+  const { syncTableToDatabase } = useTablePersistence();
+
+  // Component mounted - ready to handle table interactions
 
   const isTableInChat = useCallback((table: HTMLTableElement): boolean => {
-    const chatSelectors = [
-      '.markdown-shadow-body',
-      '.message-item',
-      '[class*="chat"]',
-      '[class*="message"]',
-      '[class*="conversation"]',
-      '.prose',
-      '.markdown-body',
-      '.arco-typography',
-      '[class*="markdown"]',
-      '[class*="content"]',
-    ];
+    const chatSelectors = ['.markdown-shadow-body', '.message-item', '[class*="chat"]', '[class*="message"]', '[class*="conversation"]', '.prose', '.markdown-body', '.arco-typography', '[class*="markdown"]', '[class*="content"]'];
 
-    return chatSelectors.some((selector) => table.closest(selector));
+    // Check if table is in chat area
+    const inChat = chatSelectors.some((selector) => table.closest(selector));
+
+    return inChat;
   }, []);
 
   const showMenu = useCallback((x: number, y: number) => {
@@ -54,6 +46,43 @@ export const TableContextMenu: React.FC = () => {
     Message.info(message);
   }, []);
 
+  // Sync table modifications to database
+  const syncTable = useCallback(() => {
+    console.log('[TableContextMenu] 🔄 syncTable called');
+    console.log('[TableContextMenu] 📊 targetTable:', targetTable);
+
+    if (!targetTable) {
+      console.warn('[TableContextMenu] ⚠️ Cannot sync - missing targetTable');
+      return;
+    }
+
+    // Extract conversationId from URL directly (don't rely on state)
+    const url = window.location.href;
+    console.log('[TableContextMenu] 🔍 Current URL:', url);
+
+    let extractedConvId: string | null = null;
+
+    // Try multiple patterns
+    let match = url.match(/\/conversation\/([^/?#]+)/);
+    if (!match) match = url.match(/\/(?:chat|c)\/([^/?#]+)/);
+    if (!match) {
+      const urlObj = new URL(url);
+      const convId = urlObj.searchParams.get('conversation_id') || urlObj.searchParams.get('id');
+      if (convId) extractedConvId = convId;
+    } else {
+      extractedConvId = match[1];
+    }
+
+    console.log('[TableContextMenu] 🆔 Extracted conversationId:', extractedConvId);
+
+    if (!extractedConvId) {
+      console.warn('[TableContextMenu] ⚠️ Cannot sync - could not extract conversationId from URL');
+      return;
+    }
+
+    void syncTableToDatabase(targetTable, extractedConvId);
+  }, [targetTable, syncTableToDatabase]);
+
   // Table operations
   const enableCellEditing = useCallback(() => {
     if (!targetTable) return;
@@ -61,10 +90,15 @@ export const TableContextMenu: React.FC = () => {
     cells.forEach((cell) => {
       (cell as HTMLElement).contentEditable = 'true';
       (cell as HTMLElement).style.cursor = 'text';
+
+      // Add blur event to sync when user finishes editing a cell
+      cell.addEventListener('blur', () => {
+        syncTable();
+      });
     });
     showNotification('✅ Cell editing enabled');
     hideMenu();
-  }, [targetTable, showNotification, hideMenu]);
+  }, [targetTable, showNotification, syncTable, hideMenu]);
 
   const insertRowBelow = useCallback(() => {
     if (!targetTable) return;
@@ -88,8 +122,9 @@ export const TableContextMenu: React.FC = () => {
       targetTable.appendChild(newRow);
     }
     showNotification('✅ Row added');
+    syncTable(); // Sync after adding row
     hideMenu();
-  }, [targetTable, showNotification, hideMenu]);
+  }, [targetTable, showNotification, syncTable, hideMenu]);
 
   const insertColumnRight = useCallback(() => {
     if (!targetTable) return;
@@ -103,8 +138,9 @@ export const TableContextMenu: React.FC = () => {
       row.appendChild(newCell);
     });
     showNotification('✅ Column added');
+    syncTable(); // Sync after adding column
     hideMenu();
-  }, [targetTable, showNotification, hideMenu]);
+  }, [targetTable, showNotification, syncTable, hideMenu]);
 
   const deleteSelectedRow = useCallback(() => {
     if (!activeCell) {
@@ -115,9 +151,10 @@ export const TableContextMenu: React.FC = () => {
     if (row && window.confirm('Delete this row?')) {
       row.remove();
       showNotification('✅ Row deleted');
+      syncTable(); // Sync after deleting row
     }
     hideMenu();
-  }, [activeCell, showNotification, hideMenu]);
+  }, [activeCell, showNotification, syncTable, hideMenu]);
 
   const deleteSelectedColumn = useCallback(() => {
     if (!activeCell || !targetTable) {
@@ -137,9 +174,10 @@ export const TableContextMenu: React.FC = () => {
         if (c) c.remove();
       });
       showNotification('✅ Column deleted');
+      syncTable(); // Sync after deleting column
     }
     hideMenu();
-  }, [activeCell, targetTable, showNotification, hideMenu]);
+  }, [activeCell, targetTable, showNotification, syncTable, hideMenu]);
 
   const copyTable = useCallback(() => {
     if (!targetTable) return;
@@ -175,17 +213,14 @@ export const TableContextMenu: React.FC = () => {
     hideMenu();
   }, [targetTable, showNotification, hideMenu]);
 
-  // Event listeners
+  // Event listeners with MutationObserver and contextmenu (right-click)
   useEffect(() => {
-    console.log('🔧 TableContextMenu: Setting up event listeners');
-
-    const handleClick = (e: MouseEvent) => {
+    const handleContextMenu = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
 
-      // Try to find table from the clicked element or any parent
+      // Try multiple methods to find the table
       let table = target.closest('table') as HTMLTableElement | null;
 
-      // If not found, try to find if we're inside a table cell
       if (!table) {
         const cell = target.closest('td, th');
         if (cell) {
@@ -193,30 +228,43 @@ export const TableContextMenu: React.FC = () => {
         }
       }
 
+      // If still not found, manually traverse up the DOM
+      if (!table) {
+        let element: HTMLElement | null = target;
+        let depth = 0;
+        while (element && depth < 20) {
+          if (element.tagName === 'TABLE') {
+            table = element as HTMLTableElement;
+            break;
+          }
+          element = element.parentElement;
+          depth++;
+        }
+      }
+
       if (table) {
         const inChat = isTableInChat(table);
 
         if (inChat) {
-          // Ctrl+Click or Alt+Click opens menu
-          if (e.ctrlKey || e.altKey) {
-            e.preventDefault();
-            e.stopPropagation();
-            setTargetTable(table);
-            showMenu(e.pageX, e.pageY);
-            showNotification('✅ Menu opened');
-            return;
-          }
+          // Prevent default context menu
+          e.preventDefault();
+          e.stopPropagation();
 
-          // Regular click selects table
           setTargetTable(table);
           setActiveCell(target.closest('td, th') as HTMLTableCellElement | null);
-          setShowFloatingButton(true);
+          showMenu(e.pageX, e.pageY);
+          return false;
         }
-      } else if (!target.closest('.table-context-menu')) {
+      }
+    };
+
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+
+      // Close menu if clicking outside
+      if (!target.closest('.table-context-menu') && !target.closest('table')) {
         hideMenu();
-        if (!target.closest('table')) {
-          setShowFloatingButton(false);
-        }
+        setShowFloatingButton(false);
       }
     };
 
@@ -226,12 +274,61 @@ export const TableContextMenu: React.FC = () => {
       }
     };
 
-    document.addEventListener('click', handleClick);
+    // Attach contextmenu event to document
+    document.addEventListener('contextmenu', handleContextMenu as EventListener, true);
+    document.addEventListener('click', handleClick, true);
     document.addEventListener('keydown', handleKeyDown);
 
+    // Also try to attach directly to tables (including Shadow DOM)
+    const attachToTables = () => {
+      const tables: HTMLTableElement[] = [];
+
+      // Regular tables
+      document.querySelectorAll('table').forEach((t) => tables.push(t as HTMLTableElement));
+
+      // Tables in Shadow DOM
+      document.querySelectorAll('.markdown-shadow-body').forEach((host) => {
+        if (host.shadowRoot) {
+          host.shadowRoot.querySelectorAll('table').forEach((t) => tables.push(t as HTMLTableElement));
+        }
+      });
+
+      // Also check other potential shadow hosts
+      document.querySelectorAll('[class*="markdown"], [class*="message"]').forEach((host) => {
+        if ((host as any).shadowRoot) {
+          (host as any).shadowRoot.querySelectorAll('table').forEach((t: HTMLTableElement) => tables.push(t));
+        }
+      });
+
+      tables.forEach((table) => {
+        table.addEventListener('contextmenu', handleContextMenu as EventListener, true);
+      });
+    };
+
+    // Initial attachment
+    attachToTables();
+
+    // Watch for new tables
+    const observer = new MutationObserver(() => {
+      attachToTables();
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+
     return () => {
-      document.removeEventListener('click', handleClick);
+      document.removeEventListener('contextmenu', handleContextMenu as EventListener, true);
+      document.removeEventListener('click', handleClick, true);
       document.removeEventListener('keydown', handleKeyDown);
+      observer.disconnect();
+
+      // Remove handlers from tables
+      const tables = document.querySelectorAll('table');
+      tables.forEach((table) => {
+        table.removeEventListener('contextmenu', handleContextMenu as EventListener, true);
+      });
     };
   }, [isTableInChat, showMenu, hideMenu, showNotification]);
 

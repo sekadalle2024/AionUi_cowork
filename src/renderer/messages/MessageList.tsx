@@ -54,6 +54,8 @@ const MessageItem: React.FC<{ message: TMessage }> = React.memo(
           'justify-end': message.position === 'right',
           'justify-start': message.position === 'left',
         })}
+        data-message-id={message.id}
+        data-msg-id={message.msg_id}
       >
         {props.children}
       </div>

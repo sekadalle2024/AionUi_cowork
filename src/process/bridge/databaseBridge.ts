@@ -64,4 +64,42 @@ export function initDatabaseBridge(): void {
       return [];
     }
   });
+
+  // Update message content in database (for table modifications)
+  ipcBridge.database.updateMessageContent.provider(({ messageId, conversationId, content }) => {
+    try {
+      const db = getDatabase();
+
+      // Get the existing message
+      const messages = db.getConversationMessages(conversationId, 0, 10000);
+      const existingMessage = messages.data?.find((msg) => msg.id === messageId);
+
+      if (!existingMessage) {
+        console.error('[DatabaseBridge] Message not found:', messageId);
+        return Promise.resolve({ success: false, error: 'Message not found' });
+      }
+
+      // Update the message content
+      const updatedMessage = {
+        ...existingMessage,
+        content: {
+          ...existingMessage.content,
+          content,
+        },
+      };
+
+      const result = db.updateMessage(messageId, updatedMessage);
+
+      if (result.success) {
+        console.log('[DatabaseBridge] Message content updated successfully:', messageId);
+        return Promise.resolve({ success: true });
+      } else {
+        console.error('[DatabaseBridge] Failed to update message:', result.error);
+        return Promise.resolve({ success: false, error: result.error });
+      }
+    } catch (error) {
+      console.error('[DatabaseBridge] Error updating message content:', error);
+      return Promise.resolve({ success: false, error: String(error) });
+    }
+  });
 }

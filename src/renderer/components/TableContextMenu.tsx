@@ -16,13 +16,9 @@ export const TableContextMenu: React.FC = () => {
   const [activeCell, setActiveCell] = useState<HTMLTableCellElement | null>(null);
   const [showFloatingButton, setShowFloatingButton] = useState(false);
 
-  // Debug: Log component mount
+  // Verify component is mounted
   useEffect(() => {
-    console.log('✅ TableContextMenu component mounted and active');
-    console.log('🎯 Ready to handle Ctrl+Click on tables');
-    return () => {
-      console.log('❌ TableContextMenu component unmounted');
-    };
+    console.log('✅ TableContextMenu mounted');
   }, []);
 
   const isTableInChat = useCallback((table: HTMLTableElement): boolean => {
@@ -39,23 +35,7 @@ export const TableContextMenu: React.FC = () => {
       '[class*="content"]',
     ];
 
-    // Debug: Log table's parent classes
-    const parents: string[] = [];
-    let element: HTMLElement | null = table;
-    let depth = 0;
-    while (element && element !== document.body && depth < 10) {
-      if (element.className) {
-        parents.push(element.className.toString());
-      }
-      element = element.parentElement;
-      depth++;
-    }
-    console.log('🔍 Table parent classes:', parents);
-
-    const found = chatSelectors.some((selector) => table.closest(selector));
-    console.log('🔍 Table in chat?', found, 'Tested selectors:', chatSelectors.length);
-
-    return found;
+    return chatSelectors.some((selector) => table.closest(selector));
   }, []);
 
   const showMenu = useCallback((x: number, y: number) => {
@@ -201,36 +181,37 @@ export const TableContextMenu: React.FC = () => {
 
     const handleClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      const table = target.closest('table') as HTMLTableElement | null;
 
-      console.log('🖱️ Click detected:', {
-        hasTable: !!table,
-        ctrlKey: e.ctrlKey,
-        altKey: e.altKey,
-        target: target.tagName,
-      });
+      // Try to find table from the clicked element or any parent
+      let table = target.closest('table') as HTMLTableElement | null;
+
+      // If not found, try to find if we're inside a table cell
+      if (!table) {
+        const cell = target.closest('td, th');
+        if (cell) {
+          table = cell.closest('table') as HTMLTableElement | null;
+        }
+      }
 
       if (table) {
         const inChat = isTableInChat(table);
-        console.log('📊 Table found, checking if in chat:', inChat);
 
-        // TEMPORARY: Accept all tables for testing
-        // Ctrl+Click or Alt+Click opens menu
-        if (e.ctrlKey || e.altKey) {
-          e.preventDefault();
-          e.stopPropagation();
-          console.log('✅ Opening menu at:', e.pageX, e.pageY);
+        if (inChat) {
+          // Ctrl+Click or Alt+Click opens menu
+          if (e.ctrlKey || e.altKey) {
+            e.preventDefault();
+            e.stopPropagation();
+            setTargetTable(table);
+            showMenu(e.pageX, e.pageY);
+            showNotification('✅ Menu opened');
+            return;
+          }
+
+          // Regular click selects table
           setTargetTable(table);
-          showMenu(e.pageX, e.pageY);
-          showNotification('✅ Menu opened with Ctrl+Click');
-          return;
+          setActiveCell(target.closest('td, th') as HTMLTableCellElement | null);
+          setShowFloatingButton(true);
         }
-
-        // Regular click selects table
-        console.log('📌 Table selected');
-        setTargetTable(table);
-        setActiveCell(target.closest('td, th') as HTMLTableCellElement | null);
-        setShowFloatingButton(true);
       } else if (!target.closest('.table-context-menu')) {
         hideMenu();
         if (!target.closest('table')) {

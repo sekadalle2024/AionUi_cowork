@@ -578,6 +578,48 @@ body,
     background-color 0.2s ease;
 }
 
+/* Force icon color using CSS filter on the entire chat item */
+.chat-history__item > span:first-child,
+.chat-history__item > .chat-icon-wrapper {
+  filter: grayscale(100%) brightness(0.5) !important;
+}
+
+[arco-theme="dark"] .chat-history__item > span:first-child,
+[arco-theme="dark"] .chat-history__item > .chat-icon-wrapper {
+  filter: grayscale(100%) brightness(1.2) !important;
+}
+
+/* Force chat history icon color to match theme text color */
+.chat-history-icon svg,
+.chat-history-icon path {
+  fill: var(--color-text-1) !important;
+  color: var(--color-text-1) !important;
+}
+
+.chat-icon-wrapper,
+.chat-icon-wrapper svg,
+.chat-icon-wrapper svg path,
+.chat-icon-wrapper svg * {
+  fill: var(--color-text-2) !important;
+  color: var(--color-text-2) !important;
+  stroke: none !important;
+}
+
+/* Alternative: Use CSS filter to remove blue tint */
+.chat-icon-wrapper svg {
+  filter: grayscale(100%) brightness(0.8) !important;
+}
+
+/* Light theme: darker gray */
+[arco-theme="light"] .chat-icon-wrapper svg {
+  filter: grayscale(100%) brightness(0.4) !important;
+}
+
+/* Dark theme: lighter gray */
+[arco-theme="dark"] .chat-icon-wrapper svg {
+  filter: grayscale(100%) brightness(0.9) !important;
+}
+
 .chat-history__item-name,
 .chat-history__item-editor,
 .settings-sider__item-label {

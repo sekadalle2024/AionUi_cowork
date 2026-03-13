@@ -13,7 +13,7 @@ import { blockMobileInputFocus, blurActiveElement } from '@/renderer/utils/focus
 import { cleanupSiderTooltips, getSiderTooltipProps } from '@/renderer/utils/siderTooltip';
 import { getActivityTime, createTimelineGrouper } from '@/renderer/utils/timeline';
 import { Empty, Popconfirm, Input, Tooltip } from '@arco-design/web-react';
-import { DeleteOne, MessageOne, EditOne } from '@icon-park/react';
+import { DeleteOne, Toolkit, EditOne } from '@icon-park/react';
 import classNames from 'classnames';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -192,7 +192,13 @@ const ChatHistory: React.FC<{ onSessionClick?: () => void; collapsed?: boolean }
           })}
           onClick={handleSelect.bind(null, conversation)}
         >
-          <MessageOne theme='filled' size='20' className='mt-2px flex' fill='currentColor' style={{ color: 'var(--color-text-1)' }} />
+          <span className='chat-icon-wrapper'>
+            {React.cloneElement(<Toolkit />, {
+              theme: 'outline',
+              size: '20',
+              className: 'mt-2px flex',
+            })}
+          </span>
           <FlexFullContainer className='h-24px collapsed-hidden ml-10px min-w-0'>
             {isEditing ? (
               <Input className='chat-history__item-editor text-14px lh-24px h-24px w-full' value={editingName} onChange={setEditingName} onKeyDown={handleEditKeyDown} onBlur={handleEditSave} autoFocus size='small' />

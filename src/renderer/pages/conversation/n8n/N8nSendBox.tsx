@@ -70,17 +70,20 @@ const N8nSendBox: React.FC<{
       const msg_id = uuid();
 
       // Add assistant message placeholder for immediate UI feedback
-      addOrUpdateMessage({
-        id: msg_id,
-        msg_id,
-        type: 'text',
-        position: 'left',
-        conversation_id,
-        content: {
-          content: '⏳ Exécution du workflow n8n...\n\n*Cela peut prendre plusieurs minutes pour les tâches complexes.*',
-        },
-        createdAt: Date.now(),
-      } as TMessage, true);
+      addOrUpdateMessage(
+        {
+          id: msg_id,
+          msg_id,
+          type: 'text',
+          position: 'left',
+          conversation_id,
+          content: {
+            content: '⏳ Exécution du workflow n8n...\n\n*Cela peut prendre plusieurs minutes pour les tâches complexes.*',
+          },
+          createdAt: Date.now(),
+        } as TMessage,
+        true
+      );
 
       try {
         // Send message via IPC bridge (this will save to database via N8nAgentManager)

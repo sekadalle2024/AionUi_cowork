@@ -52,6 +52,41 @@
             };
             document.head.appendChild(contextMenuScript);
           }, 500);
+
+          // Load Diagnostic Script (in development)
+          if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            setTimeout(function() {
+              const diagnosticScript = document.createElement('script');
+              diagnosticScript.src = './scripts/aionui_diagnostic.js';
+              diagnosticScript.async = true;
+              diagnosticScript.onload = function() {
+                console.log('🔍 AIONUI Diagnostic loaded');
+              };
+              document.head.appendChild(diagnosticScript);
+            }, 1000);
+
+            // Load Right-Click Test Script
+            setTimeout(function() {
+              const rightClickTestScript = document.createElement('script');
+              rightClickTestScript.src = './scripts/aionui_rightclick_test.js';
+              rightClickTestScript.async = true;
+              rightClickTestScript.onload = function() {
+                console.log('🖱️ AIONUI Right-Click Test loaded');
+              };
+              document.head.appendChild(rightClickTestScript);
+            }, 1500);
+
+            // Load Alternative Menu System (works without context menu)
+            setTimeout(function() {
+              const altMenuScript = document.createElement('script');
+              altMenuScript.src = './scripts/aionui_menu_alternative.js';
+              altMenuScript.async = true;
+              altMenuScript.onload = function() {
+                console.log('🎯 AIONUI Alternative Menu loaded');
+              };
+              document.head.appendChild(altMenuScript);
+            }, 2000);
+          }
         }, 1000);
       });
     </script>

@@ -1,87 +1,143 @@
 # 📚 Migration AIONUI - Index des Fichiers
 
+**Dernière mise à jour**: March 13, 2026  
+**Status**: 🧪 Menu contextuel en test - Redémarrage requis
+
 ## 🎯 Navigation Rapide
 
+### 🚨 DOCUMENTS PRIORITAIRES (À LIRE MAINTENANT)
+
+1. **[INSTRUCTIONS_TEST_FINAL.md](./INSTRUCTIONS_TEST_FINAL.md)** ⭐ **COMMENCER ICI**
+   - Instructions simples pour tester le menu contextuel
+   - Checklist de vérification
+   - À suivre MAINTENANT après redémarrage
+
+2. **[RESUME_MODIFICATIONS.md](./RESUME_MODIFICATIONS.md)** 📋
+   - Résumé complet de tous les changements
+   - Fichiers créés et modifiés
+   - État actuel du projet
+
+3. **[SOLUTION_FINALE_REACT.md](./SOLUTION_FINALE_REACT.md)** 🎯
+   - Documentation technique complète
+   - Guide de dépannage détaillé
+   - Explications de l'approche React
+
 ### 📖 Documentation Principale
+
 - **[README.md](./README.md)** - Vue d'ensemble complète du système
-- **[MIGRATION_COMPLETE.md](./MIGRATION_COMPLETE.md)** - Statut final de la migration
-- **[CONTEXT_MENU_INTEGRATION.md](./CONTEXT_MENU_INTEGRATION.md)** - Intégration menu contextuel
-- **[CONTEXT_MENU_FIX.md](./CONTEXT_MENU_FIX.md)** - Résolution problème clic droit
-- **[NAMING_CONVENTION_UPDATE.md](./NAMING_CONVENTION_UPDATE.md)** - Mise à jour nommage
+- **[CONTEXT_MENU_INTEGRATION.md](./CONTEXT_MENU_INTEGRATION.md)** - Intégration menu contextuel (historique)
+- **[NAMING_CONVENTION_UPDATE.md](./NAMING_CONVENTION_UPDATE.md)** - Conventions de nommage
+
+### 🔧 Documentation de Dépannage
+
+- **[TEST_MAINTENANT.md](./TEST_MAINTENANT.md)** - Tests détaillés avec diagnostics
+- **[ALTERNATIVE_MENU_SOLUTION.md](./ALTERNATIVE_MENU_SOLUTION.md)** - Solution alternative (Ctrl+Click)
+- **[RIGHT_CLICK_FIX_COMPLETE.md](./RIGHT_CLICK_FIX_COMPLETE.md)** - Tentatives de fix Electron
+- **[ELECTRON_CONTEXT_MENU_FIX.md](./ELECTRON_CONTEXT_MENU_FIX.md)** - Configuration Electron
+- **[RIGHT_CLICK_SOLUTIONS.md](./RIGHT_CLICK_SOLUTIONS.md)** - Solutions explorées
+- **[RIGHT_CLICK_DIAGNOSTIC_GUIDE.md](./RIGHT_CLICK_DIAGNOSTIC_GUIDE.md)** - Guide diagnostic
 
 ### 📁 Dossiers Organisés
 
 #### 📚 Documentation Technique
-- **[documentation/CHAT_UI_IMPROVEMENTS.md](./documentation/CHAT_UI_IMPROVEMENTS.md)** - Guide d'implémentation détaillé
-- **[documentation/table-enhancement.md](./documentation/table-enhancement.md)** - Documentation technique complète
+- **[documentation/CHAT_UI_IMPROVEMENTS.md](./documentation/CHAT_UI_IMPROVEMENTS.md)** - Guide d'implémentation
+- **[documentation/table-enhancement.md](./documentation/table-enhancement.md)** - Documentation technique Flowise
 
 #### 🔧 Scripts et Utilitaires
-- **[scripts/migration-utils.js](./scripts/migration-utils.js)** - Utilitaires de migration et conversion
+- **[scripts/migration-utils.js](./scripts/migration-utils.js)** - Utilitaires de migration
 
 #### 💡 Exemples et Modèles
-- **[examples/table-examples.md](./examples/table-examples.md)** - Formats de tables et exemples d'usage
+- **[examples/table-examples.md](./examples/table-examples.md)** - Formats de tables et exemples
 
 #### 📦 Sources Claraverse
-- **[source-claraverse/Flowise.js](./source-claraverse/Flowise.js)** - Script original Claraverse V17.1
+- **[source-claraverse/Flowise.js](./source-claraverse/Flowise.js)** - Script original V17.1
 - **[source-claraverse/Data.js](./source-claraverse/Data.js)** - Utilitaires de données
-- **[source-claraverse/menu.js](./source-claraverse/menu.js)** - Scripts de menu
+- **[source-claraverse/menu.js](./source-claraverse/menu.js)** - Menu original V9.3
 
 ## 🚀 Fichiers Actifs dans AIONUI
 
-### Scripts Publics (Runtime)
-- `public/scripts/aionui_flowise.js` - Script principal adapté (Table Enhancer)
-- `public/scripts/aionui_menu.js` - Menu contextuel pour tables
+### ✅ Composants React (NOUVEAUX - EN TEST)
+- `src/renderer/components/TableContextMenu.tsx` - **Menu contextuel React** ⭐
+- `src/renderer/components/TableContextMenuTest.tsx` - **Composant de test** 🧪
+- `src/renderer/layout.tsx` - **Modifié** pour intégrer les composants
 
-### Composants React
+### Scripts Publics (Runtime)
+- `public/scripts/aionui_flowise.js` - Table Enhancer (fonctionne)
+- `public/scripts/aionui_menu.js` - Menu contextuel (404 - remplacé par React)
+- `public/scripts/aionui_menu_alternative.js` - Alternative (404 - remplacé par React)
+
+### Hooks React
 - `src/renderer/hooks/useTableEnhancer.ts` - Hook TypeScript pour Flowise
-- `src/renderer/hooks/useContextMenu.ts` - Hook TypeScript pour Menu
-- `src/renderer/components/TableEnhancerDebug.tsx` - Interface de debug
+- `src/renderer/hooks/useContextMenu.ts` - Hook TypeScript pour Menu (non utilisé)
+
+### Composants de Debug
+- `src/renderer/components/TableEnhancerDebug.tsx` - Interface de debug Flowise
 
 ### Tests
-- `tests/unit/table-enhancer-utils.test.ts` - Tests unitaires (18 tests)
+- `tests/unit/table-enhancer-utils.test.ts` - Tests unitaires Flowise (18 tests)
 
-### Fichiers Modifiés
+### Configuration
 - `public/index.html` - Chargement asynchrone des scripts
 
 ## 🎯 Démarrage Rapide
 
-1. **Comprendre le système** → [README.md](./README.md)
-2. **Voir des exemples** → [examples/table-examples.md](./examples/table-examples.md)
-3. **Guide d'implémentation** → [documentation/CHAT_UI_IMPROVEMENTS.md](./documentation/CHAT_UI_IMPROVEMENTS.md)
-4. **Vérifier le statut** → [MIGRATION_COMPLETE.md](./MIGRATION_COMPLETE.md)
+### Pour Tester le Menu Contextuel (MAINTENANT)
 
-## 🔍 Recherche par Sujet
+1. **Redémarrer l'application**
+   ```bash
+   npm run start:all
+   ```
 
-### Configuration
-- Configuration N8N → [README.md](./README.md#configuration)
-- Sélecteurs CSS → [scripts/migration-utils.js](./scripts/migration-utils.js)
+2. **Suivre les instructions**
+   - Lire: [INSTRUCTIONS_TEST_FINAL.md](./INSTRUCTIONS_TEST_FINAL.md)
+   - Ouvrir DevTools (F12)
+   - Chercher les messages de debug
+   - Tester Ctrl+Click sur le tableau de test
 
-### Utilisation
-- Exemples de tables → [examples/table-examples.md](./examples/table-examples.md)
-- Commandes debug → [README.md](./README.md#debug-commands-browser-console)
+3. **En cas de problème**
+   - Consulter: [SOLUTION_FINALE_REACT.md](./SOLUTION_FINALE_REACT.md)
+   - Section "Dépannage"
 
-### Développement
-- Hook React → [documentation/CHAT_UI_IMPROVEMENTS.md](./documentation/CHAT_UI_IMPROVEMENTS.md#react-hook-integration)
-- Tests unitaires → [documentation/table-enhancement.md](./documentation/table-enhancement.md#testing)
+### Pour Comprendre le Système
 
-### Dépannage
-- Problèmes courants → [README.md](./README.md#troubleshooting)
-- Guide de debug → [examples/table-examples.md](./examples/table-examples.md#troubleshooting)
+1. **Vue d'ensemble** → [README.md](./README.md)
+2. **Résumé des changements** → [RESUME_MODIFICATIONS.md](./RESUME_MODIFICATIONS.md)
+3. **Exemples d'usage** → [examples/table-examples.md](./examples/table-examples.md)
 
-## 📊 Statut du Projet
+## 📊 État du Projet
 
-- ✅ **Migration**: 100% Complète
-- ✅ **Menu Contextuel**: Fonctionnel (clic droit résolu)
-- ✅ **Convention Nommage**: Unifiée avec préfixe `aionui_`
-- ✅ **Tests**: 18/18 Passants
-- ✅ **Documentation**: Complète
-- ✅ **Intégration**: React + TypeScript
-- ✅ **Prêt**: Production
+### ✅ Complété
+- [x] Table Enhancement System (Flowise) - Fonctionne
+- [x] Composant React TableContextMenu - Créé
+- [x] Intégration dans layout.tsx - Fait
+- [x] Logs de debug - Ajoutés
+- [x] Documentation complète - Créée
 
-### 🎯 Objets Globaux Disponibles
-- `window.aionui_flowise` - API Table Enhancer
-- `window.aionui_menu` - API Menu Contextuel
+### 🧪 En Test
+- [ ] Vérifier chargement du composant
+- [ ] Tester Ctrl+Click
+- [ ] Tester bouton flottant
+- [ ] Valider toutes les opérations
+
+### 🔄 À Faire Après Tests
+- [ ] Retirer composant de test
+- [ ] Retirer logs de debug
+- [ ] Tests unitaires
+- [ ] Documentation finale
+
+## 🆘 Support
+
+**En cas de problème, consulter dans l'ordre**:
+1. [INSTRUCTIONS_TEST_FINAL.md](./INSTRUCTIONS_TEST_FINAL.md) - Instructions simples
+2. [SOLUTION_FINALE_REACT.md](./SOLUTION_FINALE_REACT.md) - Dépannage détaillé
+3. [TEST_MAINTENANT.md](./TEST_MAINTENANT.md) - Tests de diagnostic
+
+**Informations à collecter**:
+- Messages console complets
+- Résultat de `document.querySelectorAll('table').length`
+- Capture d'écran
+- Erreurs en rouge
 
 ---
 
-*Tous les fichiers sont organisés pour faciliter la maintenance et l'évolution du système d'amélioration des tables AIONUI.*
+**ACTION IMMÉDIATE**: Redémarrer l'app et suivre [INSTRUCTIONS_TEST_FINAL.md](./INSTRUCTIONS_TEST_FINAL.md) 🚀

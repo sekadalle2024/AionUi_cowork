@@ -7,6 +7,8 @@
 import { ipcBridge } from '@/common';
 import { ConfigStorage, type ICssTheme } from '@/common/storage';
 import PwaPullToRefresh from '@/renderer/components/PwaPullToRefresh';
+import { TableContextMenu } from '@/renderer/components/TableContextMenu';
+import { TableContextMenuTest } from '@/renderer/components/TableContextMenuTest';
 import Titlebar from '@/renderer/components/Titlebar';
 import { Layout as ArcoLayout } from '@arco-design/web-react';
 import { MenuFold, MenuUnfold } from '@icon-park/react';
@@ -356,6 +358,8 @@ const Layout: React.FC<{
             <Suspense fallback={null}>
               <UpdateModal />
             </Suspense>
+            <TableContextMenu />
+            <TableContextMenuTest />
           </ArcoLayout.Content>
         </ArcoLayout>
       </div>

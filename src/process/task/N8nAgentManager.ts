@@ -91,7 +91,7 @@ export class N8nAgentManager {
       } else {
         // Handle error case
         const errorMessage = `❌ n8n workflow execution failed:\n\n${result.error || 'Unknown error'}`;
-        
+
         // Save error message to database
         const errorMsg: TMessage = {
           id: uuid(),
@@ -116,7 +116,7 @@ export class N8nAgentManager {
       }
     } catch (error) {
       const errorMessage = `❌ n8n execution error:\n\n${error instanceof Error ? error.message : 'Unknown error'}`;
-      
+
       // Save error message to database
       const errorMsg: TMessage = {
         id: uuid(),

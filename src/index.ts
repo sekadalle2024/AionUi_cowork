@@ -437,6 +437,9 @@ const createWindow = (): void => {
     webPreferences: {
       preload: path.join(__dirname, '../preload/index.js'),
       webviewTag: true, // 启用 webview 标签用于 HTML 预览 / Enable webview tag for HTML preview
+      contextIsolation: true,
+      nodeIntegration: false,
+      webSecurity: true,
     },
   });
   console.log(`[E-audit] Main window created (id=${mainWindow.id})`);
@@ -541,6 +544,13 @@ const createWindow = (): void => {
 
   mainWindow.webContents.on('devtools-closed', () => {
     ipcBridge.application.devToolsStateChanged.emit({ isOpen: false });
+  });
+
+  // Enable context menu events (fix for right-click not working)
+  mainWindow.webContents.on('context-menu', (_event, _params) => {
+    // Allow default context menu behavior
+    // This ensures right-click events are not blocked by Electron
+    console.log('[E-audit] Context menu event captured - right-click enabled');
   });
 
   // 关闭拦截：当启用"关闭到托盘"时，隐藏窗口而非关闭

@@ -252,7 +252,10 @@ const GuidPage: React.FC = () => {
     <ConfigProvider getPopupContainer={() => guidContainerRef.current || document.body}>
       <div ref={guidContainerRef} className={styles.guidContainer}>
         <div className={styles.guidLayout}>
-          <p className='text-2xl font-semibold mb-6 text-0 text-center'>{t('conversation.welcome.title')}</p>
+          <div className='flex flex-col items-center mb-6'>
+            <img src='/logo.png' alt='E-audit' className='w-32 h-32 mb-4 object-contain' />
+            <p className='text-2xl font-semibold text-0 text-center'>{t('conversation.welcome.title')}</p>
+          </div>
 
           {agentSelection.availableAgents === undefined ? <AgentPillBarSkeleton /> : agentSelection.availableAgents.length > 0 ? <AgentPillBar availableAgents={agentSelection.availableAgents} selectedAgentKey={agentSelection.selectedAgentKey} getAgentKey={agentSelection.getAgentKey} onSelectAgent={handleSelectAgentFromPillBar} /> : null}
 

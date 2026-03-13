@@ -67,6 +67,7 @@ const MessageText: React.FC<{ message: IMessageText }> = ({ message }) => {
   const { t } = useTranslation();
   const [showCopyAlert, setShowCopyAlert] = useState(false);
   const isUserMessage = message.position === 'right';
+  const isLoadingMessage = typeof contentToRender === 'string' && contentToRender.startsWith('🔄');
 
   // 过滤空内容，避免渲染空DOM
   if (!message.content.content || (typeof message.content.content === 'string' && !message.content.content.trim())) {
@@ -124,7 +125,10 @@ const MessageText: React.FC<{ message: IMessageText }> = ({ message }) => {
 
   return (
     <>
-      <div className={classNames('min-w-0 flex gap-8px group w-full', isUserMessage ? 'flex-row-reverse' : 'flex-row')}>
+      <div 
+        className={classNames('min-w-0 flex gap-8px group', isUserMessage ? 'flex-row-reverse' : 'flex-row')}
+        style={isUserMessage ? { maxWidth: '75%', marginLeft: '33%', width: '100%' } : { maxWidth: '95%', width: '100%' }}
+      >
         {renderAvatar()}
         <div className={classNames('min-w-0 flex flex-col flex-1', isUserMessage ? 'items-end' : 'items-start')}>
           {renderNameLabel()}
@@ -151,8 +155,48 @@ const MessageText: React.FC<{ message: IMessageText }> = ({ message }) => {
             })}
             style={cronMeta ? { borderRadius: '8px 0 8px 8px' } : undefined}
           >
-            {/* JSON 内容使用折叠组件 Use CollapsibleContent for JSON content */}
-            {json ? (
+            {/* Loading message with spinner */}
+            {isLoadingMessage ? (
+              <div className='flex items-center gap-8px py-8px'>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  style={{ animation: 'spin 1s linear infinite' }}
+                >
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="var(--color-primary-6)"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeDasharray="60"
+                    strokeDashoffset="15"
+                    opacity="0.25"
+                  />
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="var(--color-primary-6)"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeDasharray="60"
+                    strokeDashoffset="15"
+                  />
+                </svg>
+                <span className='text-t-secondary'>Exécution en cours...</span>
+                <style>{`
+                  @keyframes spin {
+                    from { transform: rotate(0deg); }
+                    to { transform: rotate(360deg); }
+                  }
+                `}</style>
+              </div>
+            ) : json ? (
               <CollapsibleContent maxHeight={200} defaultCollapsed={true}>
                 <MarkdownView codeStyle={{ marginTop: 4, marginBlock: 4 }}>{`\`\`\`json\n${JSON.stringify(data, null, 2)}\n\`\`\``}</MarkdownView>
               </CollapsibleContent>

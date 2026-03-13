@@ -68,6 +68,23 @@ const N8nSendBox: React.FC<{
       setSending(true);
 
       const msg_id = uuid();
+      const user_msg_id = uuid();
+
+      // Add user message to UI immediately
+      addOrUpdateMessage(
+        {
+          id: user_msg_id,
+          msg_id: user_msg_id,
+          type: 'text',
+          position: 'right',
+          conversation_id,
+          content: {
+            content,
+          },
+          createdAt: Date.now(),
+        } as TMessage,
+        true
+      );
 
       // Add assistant message placeholder for immediate UI feedback
       addOrUpdateMessage(
@@ -78,9 +95,9 @@ const N8nSendBox: React.FC<{
           position: 'left',
           conversation_id,
           content: {
-            content: '⏳ Exécution du workflow n8n...\n\n*Cela peut prendre plusieurs minutes pour les tâches complexes.*',
+            content: '🔄 Exécution en cours...',
           },
-          createdAt: Date.now(),
+          createdAt: Date.now() + 1,
         } as TMessage,
         true
       );

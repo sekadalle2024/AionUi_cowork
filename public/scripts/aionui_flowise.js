@@ -19,10 +19,9 @@
     N8N_ENDPOINT_URL: "https://barow52161.app.n8n.cloud/webhook/htlm_processor",
     DEBUG_LOG_HTML: true,
     SELECTORS: {
-      // AIONUI-specific selectors
-      CHAT_TABLES: ".markdown-shadow-body table, .message-item table",
+      // AIONUI-specific selectors (Shadow DOM aware)
       MESSAGE_CONTAINER: ".message-item",
-      MARKDOWN_BODY: ".markdown-shadow-body",
+      MARKDOWN_SHADOW: ".markdown-shadow",
       TABLE_WRAPPER: "div[style*='overflowX']", // ReactMarkdown table wrapper
     },
     PROCESSED_CLASS: "aionui-n8n-processed",
@@ -32,6 +31,56 @@
       MAX_CACHE_SIZE: 50,
     },
   };
+
+  /**
+   * Find all tables in chat, including those inside Shadow DOM
+   * @returns {Array<HTMLTableElement>} Array of table elements
+   */
+  function findAllChatTables() {
+    const tables = [];
+    
+    // Find all markdown-shadow containers
+    const shadowHosts = document.querySelectorAll('.markdown-shadow');
+    
+    shadowHosts.forEach(host => {
+      if (host.shadowRoot) {
+        // Query tables inside Shadow DOM
+        const shadowTables = host.shadowRoot.querySelectorAll('table');
+        tables.push(...Array.from(shadowTables));
+      }
+    });
+    
+    // Also check for tables outside Shadow DOM (fallback)
+    const regularTables = document.querySelectorAll('.message-item table');
+    tables.push(...Array.from(regularTables));
+    
+    return tables;
+  }
+
+  /**
+   * Find tables within a specific container, including Shadow DOM
+   * @param {HTMLElement} container - Container element
+   * @returns {Array<HTMLTableElement>} Array of table elements
+   */
+  function findTablesInContainer(container) {
+    const tables = [];
+    
+    // Check for Shadow DOM hosts within container
+    const shadowHosts = container.querySelectorAll('.markdown-shadow');
+    
+    shadowHosts.forEach(host => {
+      if (host.shadowRoot) {
+        const shadowTables = host.shadowRoot.querySelectorAll('table');
+        tables.push(...Array.from(shadowTables));
+      }
+    });
+    
+    // Also check for regular tables
+    const regularTables = container.querySelectorAll('table');
+    tables.push(...Array.from(regularTables));
+    
+    return tables;
+  }
 
   /**
    * Extract dynamic keyword from Flowise table (adapted for AIONUI)
@@ -221,7 +270,7 @@
     allMessageContainers.forEach((container, containerIndex) => {
       containersAnalyzed++;
 
-      const firstTable = container.querySelector(CONFIG.SELECTORS.CHAT_TABLES);
+      const firstTable = findTablesInContainer(container)[0];
       if (!firstTable) {
         console.log(`⏭️ Container ${containerIndex + 1}: No table, skipped`);
         return;
@@ -262,7 +311,7 @@
       if (keywordFound) {
         containersMatching++;
         console.log(`✅ Container ${containerIndex + 1}: Match found for keyword "${dynamicKeyword}". Collecting tables...`);
-        const allTablesInContainer = container.querySelectorAll(CONFIG.SELECTORS.CHAT_TABLES);
+        const allTablesInContainer = findTablesInContainer(container);
         console.log(`📋 Container ${containerIndex + 1}: ${allTablesInContainer.length} table(s) collected`);
         allTablesInContainer.forEach((table) => {
           collectedTablesHTML.push(table.outerHTML);
@@ -825,7 +874,7 @@
    * Scan and process all tables in AIONUI chat
    */
   function scanAndProcess() {
-    const allTables = document.querySelectorAll(CONFIG.SELECTORS.CHAT_TABLES);
+    const allTables = findAllChatTables();
     let processedCount = 0;
     let totalTablesScanned = 0;
 
@@ -962,12 +1011,18 @@
         if (mutation.type === "childList" && mutation.addedNodes.length > 0) {
           mutation.addedNodes.forEach((node) => {
             if (node.nodeType === Node.ELEMENT_NODE) {
-              // Check if the added node is a table or contains tables
-              if (node.matches && node.matches(CONFIG.SELECTORS.CHAT_TABLES)) {
+              // Check if the added node is a markdown-shadow (Shadow DOM host)
+              if (node.classList && node.classList.contains('markdown-shadow')) {
                 shouldScan = true;
-              } else if (node.querySelector) {
-                const tables = node.querySelectorAll(CONFIG.SELECTORS.CHAT_TABLES);
-                if (tables.length > 0) {
+              }
+              // Check if the added node is a message container
+              else if (node.classList && node.classList.contains('message-item')) {
+                shouldScan = true;
+              }
+              // Check if node contains markdown-shadow elements
+              else if (node.querySelector) {
+                const shadowHosts = node.querySelectorAll('.markdown-shadow, .message-item');
+                if (shadowHosts.length > 0) {
                   shouldScan = true;
                 }
               }

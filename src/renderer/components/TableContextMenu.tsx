@@ -22,12 +22,35 @@ export const TableContextMenu: React.FC = () => {
   // Component mounted - ready to handle table interactions
 
   const isTableInChat = useCallback((table: HTMLTableElement): boolean => {
-    const chatSelectors = ['.markdown-shadow-body', '.message-item', '[class*="chat"]', '[class*="message"]', '[class*="conversation"]', '.prose', '.markdown-body', '.arco-typography', '[class*="markdown"]', '[class*="content"]'];
-
-    // Check if table is in chat area
-    const inChat = chatSelectors.some((selector) => table.closest(selector));
-
-    return inChat;
+    // AIONUI renders markdown tables inside Shadow DOM
+    // Check if table is inside .markdown-shadow-body or message-item
+    let parent: HTMLElement | ShadowRoot | null = table.parentElement;
+    
+    while (parent) {
+      // Check if we're in a shadow root
+      if (parent instanceof ShadowRoot) {
+        // Check if the shadow host has markdown-shadow class
+        const host = parent.host as HTMLElement;
+        if (host?.classList.contains('markdown-shadow')) {
+          return true;
+        }
+        parent = host.parentElement;
+        continue;
+      }
+      
+      // Check for markdown-shadow-body class
+      if ((parent as HTMLElement).classList?.contains('markdown-shadow-body')) {
+        return true;
+      }
+      
+      // Check for message-item with data-message-id
+      if ((parent as HTMLElement).hasAttribute?.('data-message-id')) {
+        return true;
+      }
+      
+      parent = (parent as HTMLElement).parentElement;
+    }
+    return false;
   }, []);
 
   const showMenu = useCallback((x: number, y: number) => {

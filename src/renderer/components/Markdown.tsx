@@ -316,19 +316,101 @@ const createInitStyle = (currentTheme = 'light', cssVars?: Record<string, string
   img {
     max-width: 100%;
   }
-   /* 给整个表格添加边框 */
+  
+  /* ========================================
+     CLARAVERSE TABLE STYLES - ADAPTED FOR AIONUI
+     ======================================== */
+  
+  /* Base table styles with Claraverse shadow effects */
   table {
-    border-collapse: collapse;  /* 表格边框合并为单一边框 */
-    th{
-      padding: 8px;
-      border: 1px solid var(--bg-3);
-      background-color: var(--bg-1);
-      font-weight: bold;
+    box-shadow:
+      0 12px 24px 0 rgba(0, 0, 0, 0.25),
+      0 8px 16px 0 rgba(0, 0, 0, 0.2),
+      0 4px 8px 0 rgba(0, 0, 0, 0.15) !important;
+    margin: 0 !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    width: 100% !important;
+    table-layout: auto !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+    border: 1px solid var(--bg-3) !important;
+  }
+  
+  /* Claraverse burgundy red headers */
+  table th {
+    background-color: #6b1102 !important;
+    color: white !important;
+    padding: 12px 16px !important;
+    text-align: left !important;
+    font-weight: 600 !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.2) !important;
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    line-height: 1.5 !important;
+    vertical-align: top !important;
+  }
+  
+  table th:last-child {
+    border-right: none !important;
+  }
+  
+  /* Sticky headers for vertical scroll */
+  table thead {
+    position: sticky !important;
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 10 !important;
+  }
+  
+  /* Table cells */
+  table td {
+    padding: 10px 16px !important;
+    border-bottom: 1px solid var(--bg-3) !important;
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    line-height: 1.5 !important;
+    vertical-align: top !important;
+    min-width: 120px !important;
+  }
+  
+  /* Hover effects on rows */
+  table tbody tr {
+    transition: background-color 0.2s ease !important;
+  }
+  
+  table tbody tr:hover {
+    background-color: var(--color-fill-1) !important;
+  }
+  
+  /* Editable cells styling */
+  table td[contenteditable="true"] {
+    cursor: text !important;
+    outline: 2px solid transparent !important;
+    transition: outline-color 0.2s ease !important;
+  }
+  
+  table td[contenteditable="true"]:focus {
+    outline-color: var(--color-primary-6) !important;
+    background-color: var(--color-fill-1) !important;
+  }
+  
+  /* Processed table marker */
+  table.aionui-n8n-processed {
+    border-left: 3px solid var(--color-primary-6) !important;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    table th,
+    table td {
+      padding: 8px 12px !important;
+      font-size: 14px !important;
     }
-    td{
-        padding: 8px;
-        border: 1px solid var(--bg-3);
-        min-width: 120px;
+    table td {
+      min-width: 100px !important;
     }
   }
   /* Inline code should wrap on small screens to avoid horizontal overflow */

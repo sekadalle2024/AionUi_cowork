@@ -146,10 +146,10 @@ const MessageText: React.FC<{ message: IMessageText }> = ({ message }) => {
           )}
           <div
             className={classNames('min-w-0 [&>p:first-child]:mt-0px [&>p:last-child]:mb-0px md:max-w-780px', {
-              'bg-aou-2 p-8px': isUserMessage || cronMeta,
-              'w-full': !(isUserMessage || cronMeta),
+              'bg-aou-2 p-8px': cronMeta,
+              'w-full': !cronMeta,
             })}
-            style={isUserMessage || cronMeta ? { borderRadius: '8px 0 8px 8px' } : undefined}
+            style={cronMeta ? { borderRadius: '8px 0 8px 8px' } : undefined}
           >
             {/* JSON 内容使用折叠组件 Use CollapsibleContent for JSON content */}
             {json ? (

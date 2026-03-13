@@ -402,12 +402,31 @@
 
     // === TABLE DETECTION ===
     isTableInChat(table) {
-      // AIONUI-specific selectors
-      if (table.closest(".markdown-shadow-body") || table.closest(".message-item")) {
-        return true;
+      // AIONUI renders tables inside Shadow DOM - need to traverse shadow boundaries
+      let element = table;
+      
+      while (element) {
+        // Check if current element matches chat selectors
+        if (element.classList) {
+          if (element.classList.contains('markdown-shadow-body') ||
+              element.classList.contains('message-item') ||
+              element.hasAttribute('data-message-id')) {
+            return true;
+          }
+        }
+        
+        // Move to parent, handling Shadow DOM boundaries
+        if (element.parentElement) {
+          element = element.parentElement;
+        } else if (element.parentNode instanceof ShadowRoot) {
+          // Cross Shadow DOM boundary to host element
+          element = element.parentNode.host;
+        } else {
+          break;
+        }
       }
       
-      // Additional selectors for chat context
+      // Fallback: check for additional chat context selectors
       const chatSelectors = [
         '[class*="chat"]',
         '[class*="message"]',

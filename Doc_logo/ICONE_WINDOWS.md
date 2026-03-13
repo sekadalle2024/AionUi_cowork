@@ -60,21 +60,28 @@ Pour une application Electron sur Windows, vous avez besoin de:
 
 #### Pour .ico (Windows)
 
-1. **icoconvert.com**
-   - Aller sur https://icoconvert.com/
-   - Uploader votre `logo.png` (minimum 256x256px)
-   - Sélectionner les tailles: 16, 32, 48, 256
-   - Télécharger le fichier `.ico`
-
-2. **favicon.io**
+1. **favicon.io** ⭐ Recommandé
    - Aller sur https://favicon.io/favicon-converter/
-   - Uploader votre logo
+   - Uploader votre `logo.png` (minimum 256x256px)
    - Télécharger le pack d'icônes
+   - Renommer `favicon.ico` en `app.ico`
 
-3. **cloudconvert.com**
+2. **cloudconvert.com**
    - Aller sur https://cloudconvert.com/png-to-ico
    - Uploader votre logo
+   - Options avancées: Sélectionner tailles 16, 32, 48, 256
+   - Convertir et télécharger
+
+3. **convertio.co**
+   - Aller sur https://convertio.co/png-ico/
+   - Uploader votre logo
    - Convertir en .ico
+
+4. **online-convert.com**
+   - Aller sur https://image.online-convert.com/convert-to-ico
+   - Uploader votre logo
+   - Sélectionner les tailles d'icônes
+   - Convertir
 
 #### Pour .icns (macOS)
 
@@ -82,6 +89,10 @@ Pour une application Electron sur Windows, vous avez besoin de:
    - Aller sur https://cloudconvert.com/png-to-icns
    - Uploader votre logo
    - Convertir en .icns
+
+2. **anyconv.com**
+   - Aller sur https://anyconv.com/png-to-icns-converter/
+   - Uploader et convertir
 
 ### Option 2: Ligne de commande
 
@@ -275,9 +286,10 @@ mainWindow = new BrowserWindow({
 ## Ressources
 
 ### Outils en ligne
-- https://icoconvert.com/ - Convertir PNG vers ICO
+- https://favicon.io/favicon-converter/ - Convertir PNG vers ICO (Recommandé)
 - https://cloudconvert.com/ - Convertir vers ICO/ICNS
-- https://favicon.io/ - Générateur d'icônes
+- https://convertio.co/png-ico/ - Convertisseur PNG vers ICO
+- https://image.online-convert.com/convert-to-ico - Convertisseur avec options avancées
 
 ### Outils CLI
 - ImageMagick: https://imagemagick.org/

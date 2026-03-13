@@ -1,5 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { withCsrfToken } from '@/webserver/middleware/csrfClient';
+import { ConfigStorage } from '@/common/storage';
 
 type AuthStatus = 'checking' | 'authenticated' | 'unauthenticated';
 
@@ -71,6 +72,43 @@ export const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
 
   const refresh = useCallback(async () => {
     if (isDesktopRuntime) {
+      // Check if login is required for desktop mode
+      try {
+        const loginEnabled = await ConfigStorage.get('security.loginEnabled');
+        
+        if (loginEnabled === true) {
+          // Check if user has a valid session
+          const loggedIn = localStorage.getItem('eaudit_logged_in');
+          const loginTime = localStorage.getItem('eaudit_login_time');
+          
+          if (loggedIn === 'true' && loginTime) {
+            const elapsed = Date.now() - parseInt(loginTime, 10);
+            const sessionDuration = 24 * 60 * 60 * 1000; // 24 hours
+            
+            if (elapsed < sessionDuration) {
+              // Valid session
+              setStatus('authenticated');
+              setUser({ id: 'desktop-user', username: 'Desktop User' });
+              setReady(true);
+              return;
+            } else {
+              // Session expired
+              localStorage.removeItem('eaudit_logged_in');
+              localStorage.removeItem('eaudit_login_time');
+            }
+          }
+          
+          // No valid session, require login
+          setStatus('unauthenticated');
+          setUser(null);
+          setReady(true);
+          return;
+        }
+      } catch (error) {
+        console.error('Failed to check login settings:', error);
+      }
+      
+      // Login not required, authenticate automatically
       setStatus('authenticated');
       setUser(null);
       setReady(true);
@@ -103,6 +141,21 @@ export const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
   const login = useCallback(async ({ username, password, remember }: LoginParams): Promise<LoginResult> => {
     try {
       if (isDesktopRuntime) {
+        // Simple validation for desktop mode
+        if (!username || !password) {
+          return {
+            success: false,
+            message: 'Veuillez remplir tous les champs',
+            code: 'invalidCredentials',
+          };
+        }
+        
+        // Store login state
+        localStorage.setItem('eaudit_logged_in', 'true');
+        localStorage.setItem('eaudit_login_time', Date.now().toString());
+        
+        setUser({ id: 'desktop-user', username });
+        setStatus('authenticated');
         setReady(true);
         return { success: true };
       }
@@ -162,8 +215,10 @@ export const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
 
   const logout = useCallback(async () => {
     if (isDesktopRuntime) {
+      localStorage.removeItem('eaudit_logged_in');
+      localStorage.removeItem('eaudit_login_time');
       setUser(null);
-      setStatus('authenticated');
+      setStatus('unauthenticated');
       setReady(true);
       return;
     }

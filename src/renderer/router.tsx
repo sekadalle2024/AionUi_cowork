@@ -11,6 +11,7 @@ const DisplaySettings = React.lazy(() => import('./pages/settings/DisplaySetting
 const GeminiSettings = React.lazy(() => import('./pages/settings/GeminiSettings'));
 const ModeSettings = React.lazy(() => import('./pages/settings/ModeSettings'));
 const SystemSettings = React.lazy(() => import('./pages/settings/SystemSettings'));
+const SecuritySettings = React.lazy(() => import('./pages/settings/SecuritySettings'));
 const ToolsSettings = React.lazy(() => import('./pages/settings/ToolsSettings'));
 const WebuiSettings = React.lazy(() => import('./pages/settings/WebuiSettings'));
 const ExtensionSettingsPage = React.lazy(() => import('./pages/settings/ExtensionSettingsPage'));
@@ -56,6 +57,7 @@ const PanelRoute: React.FC<{ layout: React.ReactElement }> = ({ layout }) => {
           <Route path='/settings/display' element={withRouteFallback(DisplaySettings)} />
           <Route path='/settings/webui' element={withRouteFallback(WebuiSettings)} />
           <Route path='/settings/system' element={withRouteFallback(SystemSettings)} />
+          <Route path='/settings/security' element={withRouteFallback(SecuritySettings)} />
           <Route path='/settings/about' element={withRouteFallback(About)} />
           <Route path='/settings/tools' element={withRouteFallback(ToolsSettings)} />
           <Route path='/settings/ext/:tabId' element={withRouteFallback(ExtensionSettingsPage)} />

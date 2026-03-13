@@ -11,7 +11,7 @@ import { Tooltip } from '@arco-design/web-react';
 import { getSiderTooltipProps } from '@/renderer/utils/siderTooltip';
 
 /** Builtin settings tab IDs in display order (must match router paths). */
-const BUILTIN_TAB_IDS = ['gemini', 'model', 'agent', 'tools', 'display', 'webui', 'system', 'about'] as const;
+const BUILTIN_TAB_IDS = ['gemini', 'model', 'agent', 'tools', 'display', 'webui', 'system', 'security', 'about'] as const;
 
 type SiderItem = {
   id: string;
@@ -96,6 +96,7 @@ const SettingsSider: React.FC<{ collapsed?: boolean; tooltipEnabled?: boolean }>
       display: { id: 'display', label: t('settings.display'), icon: <Computer />, path: 'display' },
       webui: { id: 'webui', label: t('settings.webui'), icon: isDesktop ? <Earth /> : <Communication />, path: 'webui' },
       system: { id: 'system', label: t('settings.system'), icon: <System />, path: 'system' },
+      security: { id: 'security', label: 'Sécurité', icon: <Puzzle />, path: 'security' },
       about: { id: 'about', label: t('settings.about'), icon: <Info />, path: 'about' },
     };
 

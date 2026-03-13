@@ -28,6 +28,7 @@ import React, { useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styles from './index.module.css';
+import logoImage from '@renderer/assets/logo.png';
 
 const GuidPage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -253,7 +254,7 @@ const GuidPage: React.FC = () => {
       <div ref={guidContainerRef} className={styles.guidContainer}>
         <div className={styles.guidLayout}>
           <div className='flex flex-col items-center mb-6'>
-            <img src='/logo.png' alt='E-audit' className='w-32 h-32 mb-4 object-contain' />
+            <img src={logoImage} alt='E-audit' className='w-32 h-32 mb-4 object-contain' />
             <p className='text-2xl font-semibold text-0 text-center'>{t('conversation.welcome.title')}</p>
           </div>
 

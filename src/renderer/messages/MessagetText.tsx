@@ -101,17 +101,17 @@ const MessageText: React.FC<{ message: IMessageText }> = ({ message }) => {
   // Render avatar based on message position
   const renderAvatar = () => {
     if (isUserMessage) {
-      // User avatar
+      // User avatar with filled style and border
       return (
-        <Avatar size={32} className='flex-shrink-0' style={{ backgroundColor: 'var(--color-fill-2)' }}>
-          <User theme='outline' size='18' fill={iconColors.secondary} />
+        <Avatar size={32} className='flex-shrink-0' style={{ backgroundColor: 'var(--color-fill-2)', border: '1px solid var(--color-border-2)' }}>
+          <User theme='filled' size='18' fill='currentColor' style={{ color: 'var(--color-text-1)' }} />
         </Avatar>
       );
     } else {
-      // System avatar (E-audit) - using Robot icon as fallback
+      // System avatar (E-audit) with filled style and border
       return (
-        <Avatar size={32} className='flex-shrink-0' style={{ backgroundColor: 'var(--color-fill-2)' }}>
-          <Robot theme='outline' size='18' fill={iconColors.primary} />
+        <Avatar size={32} className='flex-shrink-0' style={{ backgroundColor: 'var(--color-fill-2)', border: '1px solid var(--color-border-2)' }}>
+          <Robot theme='filled' size='18' fill='currentColor' style={{ color: 'var(--color-text-1)' }} />
         </Avatar>
       );
     }

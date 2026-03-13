@@ -261,8 +261,8 @@ const createInitStyle = (currentTheme = 'light', cssVars?: Record<string, string
   }
 
   * {
-    line-height:26px;
-    font-size:16px;
+    line-height:24px;
+    font-size:14px;
     color: inherit;
   }
 
@@ -293,8 +293,8 @@ const createInitStyle = (currentTheme = 'light', cssVars?: Record<string, string
     font-weight: bold;
   }
   h2,h3,h4,h5,h6{
-    font-size: 16px;
-    line-height: 24px;
+    font-size: 15px;
+    line-height: 22px;
     font-weight: bold;
     margin-top: 8px;
     margin-bottom: 8px;
@@ -337,6 +337,20 @@ const createInitStyle = (currentTheme = 'light', cssVars?: Record<string, string
     border: 1px solid var(--bg-3) !important;
   }
   
+  /* White background for light theme only */
+  :host-context([arco-theme="light"]) table {
+    background-color: #ffffff !important;
+  }
+  
+  /* Enhanced box-shadow for light theme - elevated effect */
+  :host-context([arco-theme="light"]) table {
+    box-shadow:
+      0 16px 32px 0 rgba(0, 0, 0, 0.15),
+      0 12px 24px 0 rgba(0, 0, 0, 0.12),
+      0 8px 16px 0 rgba(0, 0, 0, 0.1),
+      0 4px 8px 0 rgba(0, 0, 0, 0.08) !important;
+  }
+  
   /* Claraverse burgundy red headers */
   table th {
     background-color: #6b1102 !important;
@@ -376,6 +390,11 @@ const createInitStyle = (currentTheme = 'light', cssVars?: Record<string, string
     min-width: 120px !important;
   }
   
+  /* White background for cells in light theme */
+  :host-context([arco-theme="light"]) table td {
+    background-color: #ffffff !important;
+  }
+  
   /* Hover effects on rows */
   table tbody tr {
     transition: background-color 0.2s ease !important;
@@ -383,6 +402,15 @@ const createInitStyle = (currentTheme = 'light', cssVars?: Record<string, string
   
   table tbody tr:hover {
     background-color: var(--color-fill-1) !important;
+  }
+  
+  /* Light theme hover - subtle gray */
+  :host-context([arco-theme="light"]) table tbody tr:hover {
+    background-color: #f7f8fa !important;
+  }
+  
+  :host-context([arco-theme="light"]) table tbody tr:hover td {
+    background-color: #f7f8fa !important;
   }
   
   /* Editable cells styling */

@@ -192,7 +192,7 @@ const ChatHistory: React.FC<{ onSessionClick?: () => void; collapsed?: boolean }
           })}
           onClick={handleSelect.bind(null, conversation)}
         >
-          <MessageOne theme='outline' size='20' className='mt-2px flex' />
+          <MessageOne theme='filled' size='20' className='mt-2px flex' fill='currentColor' style={{ color: 'var(--color-text-1)' }} />
           <FlexFullContainer className='h-24px collapsed-hidden ml-10px min-w-0'>
             {isEditing ? (
               <Input className='chat-history__item-editor text-14px lh-24px h-24px w-full' value={editingName} onChange={setEditingName} onKeyDown={handleEditKeyDown} onBlur={handleEditSave} autoFocus size='small' />
